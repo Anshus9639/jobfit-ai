@@ -1,6 +1,10 @@
 "use client";
 
 import { AnalyzeResult } from "@/lib/types";
+import WhyThisScore from "./WhyThisScore";
+import JobIntelligence from "./JobIntelligence";
+import ResumeXRay from "./ResumeXRay";
+import ImproveResume from "./ImproveResume";
 
 interface ResultsProps {
   result: AnalyzeResult;
@@ -50,6 +54,9 @@ export default function Results({ result, onReset }: ResultsProps) {
         <p className="text-slate-600 mt-4 max-w-2xl mx-auto">{result.recruiter_summary}</p>
       </div>
 
+      {/* Why did I get this score? */}
+      <WhyThisScore data={result.score_explanation} />
+
       {/* Score Breakdown */}
       <div className="card space-y-5">
         <h2 className="font-semibold text-slate-800">Score Breakdown</h2>
@@ -57,6 +64,9 @@ export default function Results({ result, onReset }: ResultsProps) {
         <ScoreBar label="Keyword Match" score={result.keyword_match} />
         <ScoreBar label="ATS Signals" score={result.ats_score} />
       </div>
+
+      {/* Job Intelligence */}
+      <JobIntelligence data={result.job_intelligence} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Matched Skills */}
@@ -101,6 +111,12 @@ export default function Results({ result, onReset }: ResultsProps) {
           )}
         </div>
       </div>
+
+      {/* Resume X-Ray */}
+      <ResumeXRay items={result.resume_xray} />
+
+      {/* Improve Your Resume */}
+      <ImproveResume suggestions={result.improvement_suggestions} />
 
       {/* ATS Issues */}
       <div className="card">
