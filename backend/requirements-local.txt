@@ -1,0 +1,5 @@
+# Optional development profile: local SentenceTransformer inference.
+# Not installed on Render (the default provider is a hosted embedding API).
+-r requirements.txt
+sentence-transformers==3.1.1
+torch==2.4.1

@@ -4,8 +4,10 @@ An AI/NLP resume-to-job-description match analyzer. Upload a PDF resume and past
 description — JobFit AI extracts skills, computes semantic similarity, checks basic ATS
 signals, and returns a match score along with a full breakdown of *why* you got that score.
 
-No database. No authentication. No paid APIs. No external LLM calls — all NLP runs locally
-using `sentence-transformers` (all-MiniLM-L6-v2) and scikit-learn.
+No database. No authentication. No LLM generation. Skill extraction and ATS checks run
+locally; semantic similarity uses a hosted embedding API (Hugging Face Inference Providers
+by default, which has a free tier), so the web process does not load PyTorch or model
+weights. A local SentenceTransformer backend is available for development.
 
 ## Features
 
@@ -33,8 +35,8 @@ using `sentence-transformers` (all-MiniLM-L6-v2) and scikit-learn.
 overall_score = 40% semantic similarity + 40% keyword/skill match + 20% ATS signals
 ```
 
-- **Semantic similarity** — cosine similarity between sentence-transformer embeddings of
-  the full resume and job description text.
+- **Semantic similarity** — cosine similarity between embeddings of the full resume and
+  job description, computed by the configured embedding provider (hosted by default).
 - **Keyword match** — overlap between a canonical skills dictionary extracted from both
   texts.
 - **ATS signals** — heuristic checks for structural sections (contact info, skills,
@@ -49,13 +51,19 @@ overall_score = 40% semantic similarity + 40% keyword/skill match + 20% ATS sign
 jobfit-ai/
   backend/
     app/
-      main.py               # FastAPI app, /api/analyze endpoint
-      analyzer.py            # scoring, similarity, ATS checks, score explanation,
+      main.py               # FastAPI app, /api/analyze endpoint, concurrency limits
+      config.py             # environment-driven settings (limits, provider config)
+      analyzer.py            # scoring, cosine similarity, ATS checks, score explanation,
                               # resume x-ray, job intelligence, rewrite suggestions
-      pdf_parser.py           # PyMuPDF text extraction
+      embeddings.py          # hosted/local embedding providers with retries
+      pdf_parser.py           # PyMuPDF text extraction with page/text limits
       skills.py               # skills dictionary + alias normalization
       schemas.py              # Pydantic response models
-    requirements.txt
+    tests/                    # pytest suite (scoring, PDF limits, failures, concurrency)
+    scripts/measure_memory.py # RSS measurement helper
+    requirements.txt          # production deps (no torch)
+    requirements-local.txt    # optional local SentenceTransformer inference
+    requirements-dev.txt      # tests + measurement
     .env.example
   frontend/
     app/
@@ -82,19 +90,47 @@ jobfit-ai/
 
 ### Backend (FastAPI)
 
+Hosted embeddings (default):
+
 ```bash
 cd backend
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # adjust ALLOWED_ORIGINS if needed
+
+# Token needs the "Inference Providers" permission:
+# https://huggingface.co/settings/tokens
+export EMBEDDINGS_API_KEY=hf_...        # PowerShell: $env:EMBEDDINGS_API_KEY="hf_..."
+export ALLOWED_ORIGINS=*
+
 uvicorn app.main:app --reload --port 8000
 ```
 
-The first request (or app startup) downloads the `all-MiniLM-L6-v2` model (~90 MB) from
-Hugging Face and caches it locally — this only happens once.
+Local embeddings (development only — loads PyTorch into the process):
+
+```bash
+pip install -r requirements-local.txt
+export EMBEDDINGS_PROVIDER=local
+uvicorn app.main:app --reload --port 8000
+```
+
+The local model is downloaded on the first analysis request, never at startup. The hosted
+provider is the default because a 512 MB instance cannot reliably hold PyTorch plus model
+weights alongside the web server.
+
+Other providers: set `EMBEDDINGS_PROVIDER=openai` plus `EMBEDDINGS_BASE_URL`,
+`EMBEDDINGS_MODEL`, and `EMBEDDINGS_API_KEY` for any OpenAI-compatible embedding endpoint
+(see `.env.example`).
 
 Backend runs at `http://localhost:8000`. Interactive API docs at `http://localhost:8000/docs`.
+
+### Backend tests
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest -q
+```
 
 ### Frontend (Next.js)
 
@@ -120,12 +156,22 @@ everything automatically.
 2. **Root Directory:** `backend`
 3. **Build Command:** `pip install -r requirements.txt`
 4. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. **Environment Variables:** add `ALLOWED_ORIGINS` set to your Vercel frontend URL once
-   deployed (e.g. `https://your-project.vercel.app`). Use `*` initially if you want to test
-   before the frontend is deployed.
+5. **Environment Variables:**
+   - `ALLOWED_ORIGINS` — your exact Vercel URL once deployed (e.g.
+     `https://your-project.vercel.app`). Use `*` initially if you want to test before the
+     frontend is deployed.
+   - `EMBEDDINGS_API_KEY` — Hugging Face token with **Inference Providers** permission
+     (mark it as a secret).
+   - Optional: `EMBEDDINGS_PROVIDER`, `EMBEDDINGS_BASE_URL`, `EMBEDDINGS_MODEL`,
+     `MAX_CONCURRENT_ANALYSES` (default `2`).
 
 > Free Render instances spin down after inactivity — the first request after idle can take
-> 30-60 seconds while the instance wakes up and the model loads.
+> 30-60 seconds while the instance wakes up. No model weights are loaded at startup, so the
+> web process stays well under the 512 MB limit.
+
+If `EMBEDDINGS_API_KEY` is missing, the service still starts and `/health` reports
+`"semantic_configured": false`. `/api/analyze` then returns `503` with an actionable message
+rather than a fabricated similarity or overall score.
 
 ### Frontend → Vercel
 
@@ -206,10 +252,30 @@ No manual redeploy step needed on either dashboard.
 }
 ```
 
-**Error responses:** `400` for invalid/empty PDFs, oversized files, or empty job
-descriptions, with a `detail` message.
+**Error responses:** all errors use a `detail` message.
+
+- `400` — invalid/empty/oversized PDF, encrypted PDF, page/text limit exceeded, or
+  empty/too-long job description.
+- `502` — the embedding provider returned an error or an unusable response.
+- `503` — embedding credentials are missing, or the server is at its concurrency limit
+  (`Retry-After` header included).
+- `504` — the embedding provider timed out after the configured retries.
+
+No error path returns a fabricated score.
 
 ## Troubleshooting
+
+**`503` — "Semantic similarity is not configured on the server"**
+
+- The backend is running but `EMBEDDINGS_API_KEY` is missing (or the HF token lacks the
+  Inference Providers permission). Set it in Render → Environment and redeploy.
+- `/health` shows `"semantic_configured": false` in this state.
+
+**`502` / `504` from `/api/analyze`**
+
+- The embedding provider is failing or slow. The backend retries timeouts, `429`, and
+  `5xx` responses automatically. If the provider stays unavailable, the request fails
+  without a score by design. Check the provider's status page and the Render logs.
 
 **CORS error in the browser console** (`has been blocked by CORS policy: No
 'Access-Control-Allow-Origin' header is present`), even though both Render and Vercel show
@@ -235,6 +301,16 @@ and `npm run build` process these correctly regardless.
 
 - Scanned/image-only PDF resumes won't extract text (no OCR is included) — the API returns
   a `400` in that case.
+- Resume and job-description text is sent to the configured embedding provider (Hugging
+  Face by default). Use `EMBEDDINGS_PROVIDER=local` if that data flow is not acceptable.
+- Embedding inputs are capped at `MAX_EMBEDDING_INPUT_CHARS` (default 8,000 characters per
+  side) to stay within provider/model limits. Keyword and ATS checks always use the full
+  extracted text. Very long documents are truncated for the semantic signal only.
+- PDFs are limited to 5 MB, 20 pages, and 200,000 extracted characters; requests beyond
+  that return `400`.
+- Analysis concurrency is bounded by `MAX_CONCURRENT_ANALYSES` (default 2). Excess requests
+  wait up to `MAX_CONCURRENCY_WAIT_SECONDS` (default 15) and then receive `503` with
+  `Retry-After`.
 - The skills dictionary is intentionally maintainable rather than exhaustive; extend
   `backend/app/skills.py` (`SKILLS_CANONICAL` and `_ALIASES`) to broaden coverage.
 - Resume rewrite suggestions never invent achievements, numbers, technologies, or

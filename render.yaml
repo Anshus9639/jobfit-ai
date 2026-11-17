@@ -5,7 +5,10 @@ services:
     rootDir: backend
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # One worker keeps memory predictable: each extra worker would load its own
+    # HTTP client/semaphore state (and, with the local provider, a model).
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
     envVars:
       - key: ALLOWED_ORIGINS
         value: "*"
@@ -13,3 +16,13 @@ services:
         # e.g. https://jobfit-ai.vercel.app
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # Hosted embedding API: no PyTorch/model weights in the web process.
+      - key: EMBEDDINGS_PROVIDER
+        value: huggingface
+      - key: EMBEDDINGS_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      # Secret: set in the Render dashboard (sync: false prompts on first deploy).
+      - key: EMBEDDINGS_API_KEY
+        sync: false
+      - key: MAX_CONCURRENT_ANALYSES
+        value: "2"
