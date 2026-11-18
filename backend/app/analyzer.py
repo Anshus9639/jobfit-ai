@@ -7,59 +7,33 @@ Scoring formula:
                   + 0.4 * keyword_match
                   + 0.2 * ats_score
 
-The sentence-transformer model is loaded once at module import time
-(via get_model()) and reused across requests.
+semantic_similarity is the cosine similarity of resume/job-description embeddings
+obtained from the remote embedding provider (see embeddings.py). If the provider is
+unavailable the analysis fails with an EmbeddingError -- it never substitutes a
+default or estimated score.
 """
 
+import asyncio
 import re
-from functools import lru_cache
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity as sk_cosine_similarity
-
+from .embeddings import EmbeddingClient, cosine_similarity, get_embedding_client
 from .skills import extract_skills
 
-MODEL_NAME = "all-MiniLM-L6-v2"
 
-_model = None
-
-
-def get_model():
-    """Lazily load and cache the SentenceTransformer model (singleton)."""
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer(MODEL_NAME)
-    return _model
-
-
-def compute_semantic_similarity(resume_text: str, jd_text: str) -> float:
+async def compute_semantic_similarity(
+    resume_text: str, jd_text: str, client: Optional[EmbeddingClient] = None
+) -> float:
     """
-    Cosine similarity between sentence-transformer embeddings of the
-    resume and job description. Returns a 0-100 score.
+    Cosine similarity between embeddings of the resume and job description,
+    returned as a 0-100 score. Raises EmbeddingError if embeddings are unavailable.
     """
-    model = get_model()
-    embeddings = model.encode([resume_text, jd_text])
-    sim = sk_cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+    client = client or get_embedding_client()
+    resume_vec, jd_vec = await client.embed([resume_text, jd_text])
+    sim = cosine_similarity(resume_vec, jd_vec)
     # Clamp and scale to 0-100
     sim = max(0.0, min(1.0, float(sim)))
     return round(sim * 100, 1)
-
-
-def compute_tfidf_similarity(resume_text: str, jd_text: str) -> float:
-    """
-    Fallback / supplementary TF-IDF cosine similarity, 0-100 score.
-    Not used in the final weighted score by default, but exposed for
-    diagnostics or future use.
-    """
-    try:
-        vectorizer = TfidfVectorizer(stop_words="english")
-        tfidf = vectorizer.fit_transform([resume_text, jd_text])
-        sim = sk_cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
-        return round(max(0.0, min(1.0, float(sim))) * 100, 1)
-    except ValueError:
-        return 0.0
 
 
 def compute_keyword_match(resume_text: str, jd_text: str) -> Tuple[float, List[str], List[str]]:
@@ -436,7 +410,9 @@ def detect_experience_level(jd_text: str) -> str:
 def extract_important_keywords(jd_text: str, top_n: int = 10) -> List[str]:
     skills = extract_skills(jd_text)
     freq = [(skill, len(re.findall(re.escape(skill), jd_text, re.IGNORECASE))) for skill in skills]
-    freq.sort(key=lambda x: -x[1])
+    # `skills` is a set, so ties would otherwise come out in hash-seed order and change
+    # on every process restart. Break ties alphabetically for reproducible output.
+    freq.sort(key=lambda x: (-x[1], x[0]))
     return [s for s, _ in freq[:top_n]]
 
 
@@ -524,8 +500,11 @@ def generate_improvement_suggestions(resume_text: str) -> List[Dict]:
 # Orchestration
 # ---------------------------------------------------------------------------
 
-def run_analysis(resume_text: str, jd_text: str) -> Dict:
-    semantic_similarity = compute_semantic_similarity(resume_text, jd_text)
+def build_report(resume_text: str, jd_text: str, semantic_similarity: float) -> Dict:
+    """
+    Everything except the embedding call: keyword match, ATS checks, the weighted
+    overall score, and all explanatory sections. Pure CPU, no I/O.
+    """
     keyword_match, matched_skills, missing_skills = compute_keyword_match(resume_text, jd_text)
     ats_score, ats_issues = analyze_ats(resume_text, jd_text, missing_skills)
 
@@ -564,3 +543,14 @@ def run_analysis(resume_text: str, jd_text: str) -> Dict:
         "job_intelligence": job_intelligence,
         "improvement_suggestions": improvement_suggestions,
     }
+
+async def run_analysis(
+    resume_text: str, jd_text: str, client: Optional[EmbeddingClient] = None
+) -> Dict:
+    """
+    Full analysis. The semantic score is fetched first so a provider failure aborts
+    the request (EmbeddingError) before any partial result is produced. The remaining
+    CPU-bound work runs in a worker thread to keep the event loop responsive.
+    """
+    semantic_similarity = await compute_semantic_similarity(resume_text, jd_text, client)
+    return await asyncio.to_thread(build_report, resume_text, jd_text, semantic_similarity)

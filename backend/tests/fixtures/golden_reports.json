@@ -1,0 +1,1695 @@
+{
+ "noskills": {
+  "0.0": {
+   "ats_issues": [
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects"
+   ],
+   "ats_score": 75,
+   "improvement_suggestions": [],
+   "job_intelligence": {
+    "experience_level": "Senior",
+    "important_keywords": [],
+    "requirements": [],
+    "responsibilities": [],
+    "role": "Not specified",
+    "technical_skills": []
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [],
+   "overall_score": 15,
+   "recommendations": [
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume",
+    "Reframe your summary/experience to more closely match the role's focus"
+   ],
+   "recruiter_summary": "This resume shows a weak match for this role for the job description, scoring 15/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: no major gaps.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "Statements appear specific",
+     "status": "detected"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (0%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (75%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Missing or unclear projects section",
+     "Resume appears too short \u2014 add more detail on experience and projects"
+    ],
+    "strengths": [
+     "Relevant work experience detected"
+    ]
+   },
+   "semantic_similarity": 0
+  },
+  "100.0": {
+   "ats_issues": [
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects"
+   ],
+   "ats_score": 75,
+   "improvement_suggestions": [],
+   "job_intelligence": {
+    "experience_level": "Senior",
+    "important_keywords": [],
+    "requirements": [],
+    "responsibilities": [],
+    "role": "Not specified",
+    "technical_skills": []
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [],
+   "overall_score": 55,
+   "recommendations": [
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume"
+   ],
+   "recruiter_summary": "This resume shows a partial match with notable gaps for the job description, scoring 55/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: no major gaps.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "Statements appear specific",
+     "status": "detected"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (100%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (75%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Missing or unclear projects section",
+     "Resume appears too short \u2014 add more detail on experience and projects"
+    ],
+    "strengths": [
+     "Strong overall alignment with the job description",
+     "Relevant work experience detected"
+    ]
+   },
+   "semantic_similarity": 100
+  },
+  "37.4": {
+   "ats_issues": [
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects"
+   ],
+   "ats_score": 75,
+   "improvement_suggestions": [],
+   "job_intelligence": {
+    "experience_level": "Senior",
+    "important_keywords": [],
+    "requirements": [],
+    "responsibilities": [],
+    "role": "Not specified",
+    "technical_skills": []
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [],
+   "overall_score": 30,
+   "recommendations": [
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume",
+    "Reframe your summary/experience to more closely match the role's focus"
+   ],
+   "recruiter_summary": "This resume shows a weak match for this role for the job description, scoring 30/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: no major gaps.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "Statements appear specific",
+     "status": "detected"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (37%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (75%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Missing or unclear projects section",
+     "Resume appears too short \u2014 add more detail on experience and projects"
+    ],
+    "strengths": [
+     "Relevant work experience detected"
+    ]
+   },
+   "semantic_similarity": 37
+  },
+  "62.5": {
+   "ats_issues": [
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects"
+   ],
+   "ats_score": 75,
+   "improvement_suggestions": [],
+   "job_intelligence": {
+    "experience_level": "Senior",
+    "important_keywords": [],
+    "requirements": [],
+    "responsibilities": [],
+    "role": "Not specified",
+    "technical_skills": []
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [],
+   "overall_score": 40,
+   "recommendations": [
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume"
+   ],
+   "recruiter_summary": "This resume shows a partial match with notable gaps for the job description, scoring 40/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: no major gaps.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "Statements appear specific",
+     "status": "detected"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (62%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (75%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Missing or unclear projects section",
+     "Resume appears too short \u2014 add more detail on experience and projects"
+    ],
+    "strengths": [
+     "Relevant work experience detected"
+    ]
+   },
+   "semantic_similarity": 62
+  }
+ },
+ "strong": {
+  "0.0": {
+   "ats_issues": [
+    "Several important JD terms are missing: AWS, Kubernetes, Redis, SQL"
+   ],
+   "ats_score": 88,
+   "improvement_suggestions": [
+    {
+     "original": "- Responsible for writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "suggestion": "- Led writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "- Worked on a React.js dashboard with Redux for state management",
+     "suggestion": "- Contributed to a React.js dashboard with Redux for state management",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "1-3 years",
+    "important_keywords": [
+     "MongoDB",
+     "React",
+     "Node.js",
+     "TypeScript",
+     "Agile",
+     "Express.js",
+     "REST",
+     "Docker",
+     "GitHub",
+     "JavaScript"
+    ],
+    "requirements": [
+     "1-3 years of experience with JavaScript and TypeScript",
+     "Strong knowledge of React, Node.js, MongoDB and SQL",
+     "Familiarity with CI/CD, Kubernetes and Redis is a plus",
+     "Good understanding of Data Structures and Algorithms"
+    ],
+    "responsibilities": [
+     "Design and build features with React and Node.js",
+     "Develop REST APIs using Express.js and MongoDB",
+     "Write automated tests with Jest",
+     "Deploy services using Docker and AWS",
+     "Work in an Agile team and review pull requests on GitHub"
+    ],
+    "role": "Full Stack Developer",
+    "technical_skills": [
+     "AWS",
+     "Agile",
+     "Algorithms",
+     "CI/CD",
+     "Data Structures",
+     "Docker",
+     "Express.js",
+     "GitHub",
+     "JavaScript",
+     "Jest",
+     "Kubernetes",
+     "MongoDB",
+     "Node.js",
+     "REST",
+     "React",
+     "Redis",
+     "SQL",
+     "TypeScript"
+    ]
+   },
+   "keyword_match": 78,
+   "matched_skills": [
+    "Agile",
+    "Algorithms",
+    "CI/CD",
+    "Data Structures",
+    "Docker",
+    "Express.js",
+    "GitHub",
+    "JavaScript",
+    "Jest",
+    "MongoDB",
+    "Node.js",
+    "REST",
+    "React",
+    "TypeScript"
+   ],
+   "missing_skills": [
+    "AWS",
+    "Kubernetes",
+    "Redis",
+    "SQL"
+   ],
+   "overall_score": 49,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Kubernetes, Redis, SQL",
+    "Reframe your summary/experience to more closely match the role's focus"
+   ],
+   "recruiter_summary": "This resume shows a partial match with notable gaps for the job description, scoring 49/100 overall. Strong overlap in: Agile, Algorithms, CI/CD, Data Structures, Docker. Key gaps to address: AWS, Kubernetes, Redis, SQL.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "25 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "14 strong action verbs found",
+     "status": "detected"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "2 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (0%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (78%, 40% weight) measures direct overlap of technical skills; and ATS signals (88%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Kubernetes not detected in resume",
+     "Redis not detected in resume",
+     "SQL not detected in resume"
+    ],
+    "strengths": [
+     "Strong Agile alignment",
+     "Strong Algorithms alignment",
+     "Strong CI/CD alignment",
+     "Strong Data Structures alignment",
+     "Good keyword coverage with the job description",
+     "Relevant project experience detected"
+    ]
+   },
+   "semantic_similarity": 0
+  },
+  "100.0": {
+   "ats_issues": [
+    "Several important JD terms are missing: AWS, Kubernetes, Redis, SQL"
+   ],
+   "ats_score": 88,
+   "improvement_suggestions": [
+    {
+     "original": "- Responsible for writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "suggestion": "- Led writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "- Worked on a React.js dashboard with Redux for state management",
+     "suggestion": "- Contributed to a React.js dashboard with Redux for state management",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "1-3 years",
+    "important_keywords": [
+     "MongoDB",
+     "React",
+     "Node.js",
+     "TypeScript",
+     "Agile",
+     "Express.js",
+     "REST",
+     "Docker",
+     "GitHub",
+     "JavaScript"
+    ],
+    "requirements": [
+     "1-3 years of experience with JavaScript and TypeScript",
+     "Strong knowledge of React, Node.js, MongoDB and SQL",
+     "Familiarity with CI/CD, Kubernetes and Redis is a plus",
+     "Good understanding of Data Structures and Algorithms"
+    ],
+    "responsibilities": [
+     "Design and build features with React and Node.js",
+     "Develop REST APIs using Express.js and MongoDB",
+     "Write automated tests with Jest",
+     "Deploy services using Docker and AWS",
+     "Work in an Agile team and review pull requests on GitHub"
+    ],
+    "role": "Full Stack Developer",
+    "technical_skills": [
+     "AWS",
+     "Agile",
+     "Algorithms",
+     "CI/CD",
+     "Data Structures",
+     "Docker",
+     "Express.js",
+     "GitHub",
+     "JavaScript",
+     "Jest",
+     "Kubernetes",
+     "MongoDB",
+     "Node.js",
+     "REST",
+     "React",
+     "Redis",
+     "SQL",
+     "TypeScript"
+    ]
+   },
+   "keyword_match": 78,
+   "matched_skills": [
+    "Agile",
+    "Algorithms",
+    "CI/CD",
+    "Data Structures",
+    "Docker",
+    "Express.js",
+    "GitHub",
+    "JavaScript",
+    "Jest",
+    "MongoDB",
+    "Node.js",
+    "REST",
+    "React",
+    "TypeScript"
+   ],
+   "missing_skills": [
+    "AWS",
+    "Kubernetes",
+    "Redis",
+    "SQL"
+   ],
+   "overall_score": 89,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Kubernetes, Redis, SQL"
+   ],
+   "recruiter_summary": "This resume shows a strong match for the job description, scoring 89/100 overall. Strong overlap in: Agile, Algorithms, CI/CD, Data Structures, Docker. Key gaps to address: AWS, Kubernetes, Redis, SQL.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "25 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "14 strong action verbs found",
+     "status": "detected"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "2 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (100%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (78%, 40% weight) measures direct overlap of technical skills; and ATS signals (88%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Kubernetes not detected in resume",
+     "Redis not detected in resume",
+     "SQL not detected in resume"
+    ],
+    "strengths": [
+     "Strong Agile alignment",
+     "Strong Algorithms alignment",
+     "Strong CI/CD alignment",
+     "Strong Data Structures alignment",
+     "Good keyword coverage with the job description",
+     "Strong overall alignment with the job description"
+    ]
+   },
+   "semantic_similarity": 100
+  },
+  "37.4": {
+   "ats_issues": [
+    "Several important JD terms are missing: AWS, Kubernetes, Redis, SQL"
+   ],
+   "ats_score": 88,
+   "improvement_suggestions": [
+    {
+     "original": "- Responsible for writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "suggestion": "- Led writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "- Worked on a React.js dashboard with Redux for state management",
+     "suggestion": "- Contributed to a React.js dashboard with Redux for state management",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "1-3 years",
+    "important_keywords": [
+     "MongoDB",
+     "React",
+     "Node.js",
+     "TypeScript",
+     "Agile",
+     "Express.js",
+     "REST",
+     "Docker",
+     "GitHub",
+     "JavaScript"
+    ],
+    "requirements": [
+     "1-3 years of experience with JavaScript and TypeScript",
+     "Strong knowledge of React, Node.js, MongoDB and SQL",
+     "Familiarity with CI/CD, Kubernetes and Redis is a plus",
+     "Good understanding of Data Structures and Algorithms"
+    ],
+    "responsibilities": [
+     "Design and build features with React and Node.js",
+     "Develop REST APIs using Express.js and MongoDB",
+     "Write automated tests with Jest",
+     "Deploy services using Docker and AWS",
+     "Work in an Agile team and review pull requests on GitHub"
+    ],
+    "role": "Full Stack Developer",
+    "technical_skills": [
+     "AWS",
+     "Agile",
+     "Algorithms",
+     "CI/CD",
+     "Data Structures",
+     "Docker",
+     "Express.js",
+     "GitHub",
+     "JavaScript",
+     "Jest",
+     "Kubernetes",
+     "MongoDB",
+     "Node.js",
+     "REST",
+     "React",
+     "Redis",
+     "SQL",
+     "TypeScript"
+    ]
+   },
+   "keyword_match": 78,
+   "matched_skills": [
+    "Agile",
+    "Algorithms",
+    "CI/CD",
+    "Data Structures",
+    "Docker",
+    "Express.js",
+    "GitHub",
+    "JavaScript",
+    "Jest",
+    "MongoDB",
+    "Node.js",
+    "REST",
+    "React",
+    "TypeScript"
+   ],
+   "missing_skills": [
+    "AWS",
+    "Kubernetes",
+    "Redis",
+    "SQL"
+   ],
+   "overall_score": 64,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Kubernetes, Redis, SQL",
+    "Reframe your summary/experience to more closely match the role's focus"
+   ],
+   "recruiter_summary": "This resume shows a reasonable match with some gaps for the job description, scoring 64/100 overall. Strong overlap in: Agile, Algorithms, CI/CD, Data Structures, Docker. Key gaps to address: AWS, Kubernetes, Redis, SQL.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "25 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "14 strong action verbs found",
+     "status": "detected"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "2 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (37%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (78%, 40% weight) measures direct overlap of technical skills; and ATS signals (88%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Kubernetes not detected in resume",
+     "Redis not detected in resume",
+     "SQL not detected in resume"
+    ],
+    "strengths": [
+     "Strong Agile alignment",
+     "Strong Algorithms alignment",
+     "Strong CI/CD alignment",
+     "Strong Data Structures alignment",
+     "Good keyword coverage with the job description",
+     "Relevant project experience detected"
+    ]
+   },
+   "semantic_similarity": 37
+  },
+  "62.5": {
+   "ats_issues": [
+    "Several important JD terms are missing: AWS, Kubernetes, Redis, SQL"
+   ],
+   "ats_score": 88,
+   "improvement_suggestions": [
+    {
+     "original": "- Responsible for writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "suggestion": "- Led writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "- Worked on a React.js dashboard with Redux for state management",
+     "suggestion": "- Contributed to a React.js dashboard with Redux for state management",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "1-3 years",
+    "important_keywords": [
+     "MongoDB",
+     "React",
+     "Node.js",
+     "TypeScript",
+     "Agile",
+     "Express.js",
+     "REST",
+     "Docker",
+     "GitHub",
+     "JavaScript"
+    ],
+    "requirements": [
+     "1-3 years of experience with JavaScript and TypeScript",
+     "Strong knowledge of React, Node.js, MongoDB and SQL",
+     "Familiarity with CI/CD, Kubernetes and Redis is a plus",
+     "Good understanding of Data Structures and Algorithms"
+    ],
+    "responsibilities": [
+     "Design and build features with React and Node.js",
+     "Develop REST APIs using Express.js and MongoDB",
+     "Write automated tests with Jest",
+     "Deploy services using Docker and AWS",
+     "Work in an Agile team and review pull requests on GitHub"
+    ],
+    "role": "Full Stack Developer",
+    "technical_skills": [
+     "AWS",
+     "Agile",
+     "Algorithms",
+     "CI/CD",
+     "Data Structures",
+     "Docker",
+     "Express.js",
+     "GitHub",
+     "JavaScript",
+     "Jest",
+     "Kubernetes",
+     "MongoDB",
+     "Node.js",
+     "REST",
+     "React",
+     "Redis",
+     "SQL",
+     "TypeScript"
+    ]
+   },
+   "keyword_match": 78,
+   "matched_skills": [
+    "Agile",
+    "Algorithms",
+    "CI/CD",
+    "Data Structures",
+    "Docker",
+    "Express.js",
+    "GitHub",
+    "JavaScript",
+    "Jest",
+    "MongoDB",
+    "Node.js",
+    "REST",
+    "React",
+    "TypeScript"
+   ],
+   "missing_skills": [
+    "AWS",
+    "Kubernetes",
+    "Redis",
+    "SQL"
+   ],
+   "overall_score": 74,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Kubernetes, Redis, SQL"
+   ],
+   "recruiter_summary": "This resume shows a reasonable match with some gaps for the job description, scoring 74/100 overall. Strong overlap in: Agile, Algorithms, CI/CD, Data Structures, Docker. Key gaps to address: AWS, Kubernetes, Redis, SQL.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Certifications",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "25 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "14 strong action verbs found",
+     "status": "detected"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": null,
+     "status": "detected"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "2 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (62%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (78%, 40% weight) measures direct overlap of technical skills; and ATS signals (88%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Kubernetes not detected in resume",
+     "Redis not detected in resume",
+     "SQL not detected in resume"
+    ],
+    "strengths": [
+     "Strong Agile alignment",
+     "Strong Algorithms alignment",
+     "Strong CI/CD alignment",
+     "Strong Data Structures alignment",
+     "Good keyword coverage with the job description",
+     "Relevant project experience detected"
+    ]
+   },
+   "semantic_similarity": 62
+  }
+ },
+ "weak": {
+  "0.0": {
+   "ats_issues": [
+    "Missing or unclear contact information",
+    "Missing or unclear skills section",
+    "Missing or unclear experience section",
+    "Missing or unclear education section",
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects",
+    "Missing measurable achievements (numbers, %, impact)",
+    "Several important JD terms are missing: AWS, Computer Vision, Deep Learning, GCP, Machine Learning and more"
+   ],
+   "ats_score": 0,
+   "improvement_suggestions": [
+    {
+     "original": "I am responsible for helping with things at my previous company.",
+     "suggestion": "I am Led helping with things at my previous company.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Worked on many tasks and was involved in various activities.",
+     "suggestion": "Contributed to many tasks and was involved in various activities.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Did some coding in Java.",
+     "suggestion": null,
+     "type": "recommendation",
+     "why": "Consider adding a measurable outcome (a number, percentage, or timeframe) if one applies, and briefly note the tools or approach you used."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "5+ years",
+    "important_keywords": [
+     "Computer Vision",
+     "Deep Learning",
+     "Machine Learning",
+     "Scikit-learn",
+     "NLP",
+     "Pandas",
+     "NumPy",
+     "AWS",
+     "Python",
+     "PyTorch"
+    ],
+    "requirements": [
+     "5+ years of experience in Python, Pandas, NumPy and Scikit-learn",
+     "Experience with Machine Learning, Deep Learning, TensorFlow and PyTorch",
+     "Strong SQL, AWS and GCP skills",
+     "Experience with NLP or Computer Vision"
+    ],
+    "responsibilities": [],
+    "role": "Data Scientist",
+    "technical_skills": [
+     "AWS",
+     "Computer Vision",
+     "Deep Learning",
+     "GCP",
+     "Machine Learning",
+     "NLP",
+     "NumPy",
+     "Pandas",
+     "PyTorch",
+     "Python",
+     "SQL",
+     "Scikit-learn",
+     "TensorFlow"
+    ]
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [
+    "AWS",
+    "Computer Vision",
+    "Deep Learning",
+    "GCP",
+    "Machine Learning",
+    "NLP",
+    "NumPy",
+    "Pandas",
+    "PyTorch",
+    "Python",
+    "SQL",
+    "Scikit-learn",
+    "TensorFlow"
+   ],
+   "overall_score": 0,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Computer Vision, Deep Learning, GCP, Machine Learning",
+    "Quantify achievements with numbers, percentages, or measurable outcomes",
+    "Add a dedicated Skills section listing your key technologies",
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume",
+    "Reframe your summary/experience to more closely match the role's focus"
+   ],
+   "recruiter_summary": "This resume shows a weak match for this role for the job description, scoring 0/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: AWS, Computer Vision, Deep Learning, GCP, Machine Learning.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "1 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": "Add numbers, percentages, or measurable outcomes",
+     "status": "warning"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "3 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (0%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (0%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Computer Vision not detected in resume",
+     "Deep Learning not detected in resume",
+     "GCP not detected in resume",
+     "Missing or unclear contact information"
+    ],
+    "strengths": [
+     "Some baseline alignment with the job description"
+    ]
+   },
+   "semantic_similarity": 0
+  },
+  "100.0": {
+   "ats_issues": [
+    "Missing or unclear contact information",
+    "Missing or unclear skills section",
+    "Missing or unclear experience section",
+    "Missing or unclear education section",
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects",
+    "Missing measurable achievements (numbers, %, impact)",
+    "Several important JD terms are missing: AWS, Computer Vision, Deep Learning, GCP, Machine Learning and more"
+   ],
+   "ats_score": 0,
+   "improvement_suggestions": [
+    {
+     "original": "I am responsible for helping with things at my previous company.",
+     "suggestion": "I am Led helping with things at my previous company.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Worked on many tasks and was involved in various activities.",
+     "suggestion": "Contributed to many tasks and was involved in various activities.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Did some coding in Java.",
+     "suggestion": null,
+     "type": "recommendation",
+     "why": "Consider adding a measurable outcome (a number, percentage, or timeframe) if one applies, and briefly note the tools or approach you used."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "5+ years",
+    "important_keywords": [
+     "Computer Vision",
+     "Deep Learning",
+     "Machine Learning",
+     "Scikit-learn",
+     "NLP",
+     "Pandas",
+     "NumPy",
+     "AWS",
+     "Python",
+     "PyTorch"
+    ],
+    "requirements": [
+     "5+ years of experience in Python, Pandas, NumPy and Scikit-learn",
+     "Experience with Machine Learning, Deep Learning, TensorFlow and PyTorch",
+     "Strong SQL, AWS and GCP skills",
+     "Experience with NLP or Computer Vision"
+    ],
+    "responsibilities": [],
+    "role": "Data Scientist",
+    "technical_skills": [
+     "AWS",
+     "Computer Vision",
+     "Deep Learning",
+     "GCP",
+     "Machine Learning",
+     "NLP",
+     "NumPy",
+     "Pandas",
+     "PyTorch",
+     "Python",
+     "SQL",
+     "Scikit-learn",
+     "TensorFlow"
+    ]
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [
+    "AWS",
+    "Computer Vision",
+    "Deep Learning",
+    "GCP",
+    "Machine Learning",
+    "NLP",
+    "NumPy",
+    "Pandas",
+    "PyTorch",
+    "Python",
+    "SQL",
+    "Scikit-learn",
+    "TensorFlow"
+   ],
+   "overall_score": 40,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Computer Vision, Deep Learning, GCP, Machine Learning",
+    "Quantify achievements with numbers, percentages, or measurable outcomes",
+    "Add a dedicated Skills section listing your key technologies",
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume"
+   ],
+   "recruiter_summary": "This resume shows a partial match with notable gaps for the job description, scoring 40/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: AWS, Computer Vision, Deep Learning, GCP, Machine Learning.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "1 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": "Add numbers, percentages, or measurable outcomes",
+     "status": "warning"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "3 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (100%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (0%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Computer Vision not detected in resume",
+     "Deep Learning not detected in resume",
+     "GCP not detected in resume",
+     "Missing or unclear contact information"
+    ],
+    "strengths": [
+     "Strong overall alignment with the job description"
+    ]
+   },
+   "semantic_similarity": 100
+  },
+  "37.4": {
+   "ats_issues": [
+    "Missing or unclear contact information",
+    "Missing or unclear skills section",
+    "Missing or unclear experience section",
+    "Missing or unclear education section",
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects",
+    "Missing measurable achievements (numbers, %, impact)",
+    "Several important JD terms are missing: AWS, Computer Vision, Deep Learning, GCP, Machine Learning and more"
+   ],
+   "ats_score": 0,
+   "improvement_suggestions": [
+    {
+     "original": "I am responsible for helping with things at my previous company.",
+     "suggestion": "I am Led helping with things at my previous company.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Worked on many tasks and was involved in various activities.",
+     "suggestion": "Contributed to many tasks and was involved in various activities.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Did some coding in Java.",
+     "suggestion": null,
+     "type": "recommendation",
+     "why": "Consider adding a measurable outcome (a number, percentage, or timeframe) if one applies, and briefly note the tools or approach you used."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "5+ years",
+    "important_keywords": [
+     "Computer Vision",
+     "Deep Learning",
+     "Machine Learning",
+     "Scikit-learn",
+     "NLP",
+     "Pandas",
+     "NumPy",
+     "AWS",
+     "Python",
+     "PyTorch"
+    ],
+    "requirements": [
+     "5+ years of experience in Python, Pandas, NumPy and Scikit-learn",
+     "Experience with Machine Learning, Deep Learning, TensorFlow and PyTorch",
+     "Strong SQL, AWS and GCP skills",
+     "Experience with NLP or Computer Vision"
+    ],
+    "responsibilities": [],
+    "role": "Data Scientist",
+    "technical_skills": [
+     "AWS",
+     "Computer Vision",
+     "Deep Learning",
+     "GCP",
+     "Machine Learning",
+     "NLP",
+     "NumPy",
+     "Pandas",
+     "PyTorch",
+     "Python",
+     "SQL",
+     "Scikit-learn",
+     "TensorFlow"
+    ]
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [
+    "AWS",
+    "Computer Vision",
+    "Deep Learning",
+    "GCP",
+    "Machine Learning",
+    "NLP",
+    "NumPy",
+    "Pandas",
+    "PyTorch",
+    "Python",
+    "SQL",
+    "Scikit-learn",
+    "TensorFlow"
+   ],
+   "overall_score": 15,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Computer Vision, Deep Learning, GCP, Machine Learning",
+    "Quantify achievements with numbers, percentages, or measurable outcomes",
+    "Add a dedicated Skills section listing your key technologies",
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume",
+    "Reframe your summary/experience to more closely match the role's focus"
+   ],
+   "recruiter_summary": "This resume shows a weak match for this role for the job description, scoring 15/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: AWS, Computer Vision, Deep Learning, GCP, Machine Learning.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "1 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": "Add numbers, percentages, or measurable outcomes",
+     "status": "warning"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "3 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (37%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (0%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Computer Vision not detected in resume",
+     "Deep Learning not detected in resume",
+     "GCP not detected in resume",
+     "Missing or unclear contact information"
+    ],
+    "strengths": [
+     "Some baseline alignment with the job description"
+    ]
+   },
+   "semantic_similarity": 37
+  },
+  "62.5": {
+   "ats_issues": [
+    "Missing or unclear contact information",
+    "Missing or unclear skills section",
+    "Missing or unclear experience section",
+    "Missing or unclear education section",
+    "Missing or unclear projects section",
+    "Resume appears too short \u2014 add more detail on experience and projects",
+    "Missing measurable achievements (numbers, %, impact)",
+    "Several important JD terms are missing: AWS, Computer Vision, Deep Learning, GCP, Machine Learning and more"
+   ],
+   "ats_score": 0,
+   "improvement_suggestions": [
+    {
+     "original": "I am responsible for helping with things at my previous company.",
+     "suggestion": "I am Led helping with things at my previous company.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Worked on many tasks and was involved in various activities.",
+     "suggestion": "Contributed to many tasks and was involved in various activities.",
+     "type": "rewrite",
+     "why": "Replaces generic/passive phrasing with a more active, ownership-focused verb, using only your original wording."
+    },
+    {
+     "original": "Did some coding in Java.",
+     "suggestion": null,
+     "type": "recommendation",
+     "why": "Consider adding a measurable outcome (a number, percentage, or timeframe) if one applies, and briefly note the tools or approach you used."
+    }
+   ],
+   "job_intelligence": {
+    "experience_level": "5+ years",
+    "important_keywords": [
+     "Computer Vision",
+     "Deep Learning",
+     "Machine Learning",
+     "Scikit-learn",
+     "NLP",
+     "Pandas",
+     "NumPy",
+     "AWS",
+     "Python",
+     "PyTorch"
+    ],
+    "requirements": [
+     "5+ years of experience in Python, Pandas, NumPy and Scikit-learn",
+     "Experience with Machine Learning, Deep Learning, TensorFlow and PyTorch",
+     "Strong SQL, AWS and GCP skills",
+     "Experience with NLP or Computer Vision"
+    ],
+    "responsibilities": [],
+    "role": "Data Scientist",
+    "technical_skills": [
+     "AWS",
+     "Computer Vision",
+     "Deep Learning",
+     "GCP",
+     "Machine Learning",
+     "NLP",
+     "NumPy",
+     "Pandas",
+     "PyTorch",
+     "Python",
+     "SQL",
+     "Scikit-learn",
+     "TensorFlow"
+    ]
+   },
+   "keyword_match": 0,
+   "matched_skills": [],
+   "missing_skills": [
+    "AWS",
+    "Computer Vision",
+    "Deep Learning",
+    "GCP",
+    "Machine Learning",
+    "NLP",
+    "NumPy",
+    "Pandas",
+    "PyTorch",
+    "Python",
+    "SQL",
+    "Scikit-learn",
+    "TensorFlow"
+   ],
+   "overall_score": 25,
+   "recommendations": [
+    "Add or highlight experience with: AWS, Computer Vision, Deep Learning, GCP, Machine Learning",
+    "Quantify achievements with numbers, percentages, or measurable outcomes",
+    "Add a dedicated Skills section listing your key technologies",
+    "Expand on project details, responsibilities, and outcomes",
+    "Mirror more of the job description's terminology in your resume"
+   ],
+   "recruiter_summary": "This resume shows a weak match for this role for the job description, scoring 25/100 overall. Strong overlap in: few overlapping skills. Key gaps to address: AWS, Computer Vision, Deep Learning, GCP, Machine Learning.",
+   "resume_xray": [
+    {
+     "label": "Contact Information",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Skills Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Experience Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Projects Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Education Section",
+     "note": null,
+     "status": "missing"
+    },
+    {
+     "label": "Certifications",
+     "note": "Optional \u2014 not all roles require certifications",
+     "status": "missing"
+    },
+    {
+     "label": "Technical Skills",
+     "note": "1 detected",
+     "status": "detected"
+    },
+    {
+     "label": "Action Verbs",
+     "note": "Only a few strong action verbs found",
+     "status": "warning"
+    },
+    {
+     "label": "Measurable Achievements",
+     "note": "Add numbers, percentages, or measurable outcomes",
+     "status": "warning"
+    },
+    {
+     "label": "Achievement Statement Strength",
+     "note": "3 generic phrase(s) detected (e.g. 'responsible for')",
+     "status": "warning"
+    }
+   ],
+   "score_explanation": {
+    "explanation": "This score combines three signals: semantic similarity (62%, 40% weight) measures how closely your resume's overall content matches the job description's meaning; keyword match (0%, 40% weight) measures direct overlap of technical skills; and ATS signals (0%, 20% weight) measure resume structure and formatting quality.",
+    "gaps": [
+     "Limited cloud experience detected",
+     "AWS not detected in resume",
+     "Computer Vision not detected in resume",
+     "Deep Learning not detected in resume",
+     "GCP not detected in resume",
+     "Missing or unclear contact information"
+    ],
+    "strengths": [
+     "Some baseline alignment with the job description"
+    ]
+   },
+   "semantic_similarity": 62
+  }
+ }
+}

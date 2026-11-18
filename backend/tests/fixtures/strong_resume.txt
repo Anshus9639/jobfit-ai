@@ -1,0 +1,29 @@
+Anshu Sharma
+anshu@example.com | +91 98765 43210 | Gurugram, India
+
+SKILLS
+JavaScript, TypeScript, React.js, Node.js, Express.js, MongoDB, REST APIs, Git, GitHub, HTML, CSS, Tailwind CSS, Docker, Postgres, Jest, Agile
+
+EXPERIENCE
+Software Developer Intern, Codolog
+- Developed a full-stack MERN application serving 2,000 users and reduced page load time by 35%
+- Built REST APIs with Node.js and Express.js, and improved query performance in MongoDB by 40%
+- Responsible for writing unit tests with Jest and maintaining the CI/CD pipeline using GitHub
+- Worked on a React.js dashboard with Redux for state management
+- Collaborated with a team of five engineers in an Agile workflow and deployed services with Docker
+- Implemented authentication and role-based access control for an internal admin portal
+- Optimized frontend bundles and delivered reusable components used across three products
+- Designed database schemas for MongoDB and documented every endpoint for the wider team
+
+PROJECTS
+Job Portal - Built a job search platform with React, Node.js, Express.js and MongoDB. Increased user engagement by 25% through personalised recommendations. Deployed on a cloud provider with automated builds.
+Expense Tracker - Created a responsive web app using React, Tailwind CSS and a REST API. Saved users an average of 3 hours a month through automated categorisation of transactions.
+Chat Application - Developed a real-time chat using Node.js and WebSockets with MongoDB persistence, supporting 500 concurrent users in load tests.
+Portfolio Website - Designed and launched a personal site with Next.js and TypeScript, achieving a 98 Lighthouse performance score.
+
+EDUCATION
+B.Tech in Information Technology (AI and Robotics), Pillai College of Engineering
+Relevant coursework: Data Structures, Algorithms, OOP, Machine Learning, Computer Networks, Operating Systems, DBMS, Software Engineering, Web Technologies.
+
+CERTIFICATIONS
+Certified in Full Stack Web Development - issued by an online learning platform, 2024. Completed several additional courses on system design, testing and cloud fundamentals, including hands-on labs, quizzes and capstone projects across the programme.
