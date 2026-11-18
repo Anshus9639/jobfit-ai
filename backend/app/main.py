@@ -3,20 +3,55 @@ main.py
 FastAPI application entrypoint for JobFit AI backend.
 """
 
+import asyncio
+import logging
 import os
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Form, UploadFile, HTTPException
+from fastapi import FastAPI, File, Form, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from .analyzer import run_analysis, get_model
+from .analyzer import run_analysis
+from .config import MAX_JD_LENGTH, MAX_PDF_SIZE_BYTES, MAX_REQUEST_BODY_BYTES
+from .embeddings import EmbeddingError, get_embedding_client, set_embedding_client
+from .limits import BodySizeLimitMiddleware, ServerBusy, get_gate, reset_gate
 from .pdf_parser import extract_text_from_pdf
 from .schemas import AnalyzeResponse
+
+logger = logging.getLogger("jobfit")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup does no model loading and no network I/O: the process stays small and
+    # boots fast on a 512 MB host. Embeddings are fetched per request from the provider.
+    client = get_embedding_client()
+    problem = client.configuration_problem()
+    if problem:
+        logger.warning(
+            "Embedding service is NOT configured (%s). The API will start, but /api/analyze "
+            "will return 503 until it is configured.",
+            problem,
+        )
+    else:
+        logger.info("Embedding provider: %s (model: %s)", client.settings.provider, client.settings.model)
+    yield
+    await client.aclose()
+    set_embedding_client(None)
+    reset_gate()
+
 
 app = FastAPI(
     title="JobFit AI",
     description="AI/NLP resume-to-job-description match analyzer (ATS-style, not an official ATS).",
     version="1.0.0",
+    lifespan=lifespan,
 )
+
+# Middleware order matters: the last one added is the outermost. The size limiter is added
+# first so it sits *inside* CORS, which lets its 413 response carry CORS headers.
+app.add_middleware(BodySizeLimitMiddleware, max_bytes=MAX_REQUEST_BODY_BYTES)
 
 # CORS: allow the configured frontend origin(s). Defaults to "*" for local dev.
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "*")
@@ -30,14 +65,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
-MAX_JD_LENGTH = 20000  # characters
+
+@app.exception_handler(EmbeddingError)
+async def embedding_error_handler(request: Request, exc: EmbeddingError):
+    # Same {"detail": ...} shape the frontend already reads. No scores are returned:
+    # a failed semantic-similarity step fails the whole analysis.
+    logger.error("analysis failed: %s (%s)", type(exc).__name__, exc.detail)
+    headers = {}
+    if exc.retry_after is not None:
+        headers["Retry-After"] = str(max(1, int(round(exc.retry_after))))
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.public_message}, headers=headers)
 
 
-@app.on_event("startup")
-def load_model_on_startup():
-    """Warm up the sentence-transformer model once at startup, not per-request."""
-    get_model()
+@app.exception_handler(ServerBusy)
+async def server_busy_handler(request: Request, exc: ServerBusy):
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "The server is busy analyzing other resumes. Please try again in a few seconds."},
+        headers={"Retry-After": str(exc.retry_after_seconds)},
+    )
 
 
 @app.get("/")
@@ -48,6 +94,18 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.get("/health/ready")
+def health_ready():
+    """Reports whether the embedding service is configured. Makes no network call."""
+    client = get_embedding_client()
+    configured = client.configuration_problem() is None
+    return {
+        "status": "ready" if configured else "degraded",
+        "embedding_provider": client.settings.provider,
+        "embedding_configured": configured,
+    }
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
@@ -69,14 +127,30 @@ async def analyze(
     if resume.content_type not in ("application/pdf", "application/x-pdf"):
         raise HTTPException(status_code=400, detail="Resume must be a PDF file.")
 
-    file_bytes = await resume.read()
-    if len(file_bytes) == 0:
-        raise HTTPException(status_code=400, detail="Uploaded resume file is empty.")
-    if len(file_bytes) > MAX_PDF_SIZE_BYTES:
-        raise HTTPException(status_code=400, detail="Resume PDF exceeds 5 MB limit.")
+    # Starlette has already spooled the upload to a temp file (disk, not RAM), and knows its
+    # size, so reject empty/oversized files without pulling any bytes into memory.
+    _check_resume_size(resume.size)
 
-    # --- Extract + analyze ---
-    resume_text = extract_text_from_pdf(file_bytes)
-    result = run_analysis(resume_text, job_description)
+    # Fail fast (503) if embeddings aren't configured, before doing any PDF work.
+    get_embedding_client().ensure_configured()
+
+    # --- Extract + analyze, with bounded concurrency ---
+    # The upload is read into RAM only once a slot is held, so at most MAX_CONCURRENT_ANALYSES
+    # resumes are ever memory-resident no matter how many requests arrive at once.
+    async with get_gate():
+        file_bytes = await resume.read(MAX_PDF_SIZE_BYTES + 1)  # +1 detects "too big"
+        _check_resume_size(len(file_bytes))
+        resume_text = await asyncio.to_thread(extract_text_from_pdf, file_bytes)
+        del file_bytes  # release the raw upload before the (slower) embedding call
+        result = await run_analysis(resume_text, job_description)
 
     return AnalyzeResponse(**result)
+
+
+def _check_resume_size(size) -> None:
+    if size is None:
+        return  # unknown until read; re-checked after reading
+    if size == 0:
+        raise HTTPException(status_code=400, detail="Uploaded resume file is empty.")
+    if size > MAX_PDF_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="Resume PDF exceeds 5 MB limit.")

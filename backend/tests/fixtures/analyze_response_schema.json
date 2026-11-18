@@ -1,0 +1,235 @@
+{
+ "$defs": {
+  "ImprovementSuggestion": {
+   "properties": {
+    "original": {
+     "title": "Original",
+     "type": "string"
+    },
+    "suggestion": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Suggestion"
+    },
+    "type": {
+     "title": "Type",
+     "type": "string"
+    },
+    "why": {
+     "title": "Why",
+     "type": "string"
+    }
+   },
+   "required": [
+    "original",
+    "why",
+    "type"
+   ],
+   "title": "ImprovementSuggestion",
+   "type": "object"
+  },
+  "JobIntelligence": {
+   "properties": {
+    "experience_level": {
+     "title": "Experience Level",
+     "type": "string"
+    },
+    "important_keywords": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Important Keywords",
+     "type": "array"
+    },
+    "requirements": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Requirements",
+     "type": "array"
+    },
+    "responsibilities": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Responsibilities",
+     "type": "array"
+    },
+    "role": {
+     "title": "Role",
+     "type": "string"
+    },
+    "technical_skills": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Technical Skills",
+     "type": "array"
+    }
+   },
+   "required": [
+    "role",
+    "technical_skills",
+    "responsibilities",
+    "requirements",
+    "experience_level",
+    "important_keywords"
+   ],
+   "title": "JobIntelligence",
+   "type": "object"
+  },
+  "ResumeXRayItem": {
+   "properties": {
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "note": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Note"
+    },
+    "status": {
+     "title": "Status",
+     "type": "string"
+    }
+   },
+   "required": [
+    "label",
+    "status"
+   ],
+   "title": "ResumeXRayItem",
+   "type": "object"
+  },
+  "ScoreExplanation": {
+   "properties": {
+    "explanation": {
+     "title": "Explanation",
+     "type": "string"
+    },
+    "gaps": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Gaps",
+     "type": "array"
+    },
+    "strengths": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Strengths",
+     "type": "array"
+    }
+   },
+   "required": [
+    "strengths",
+    "gaps",
+    "explanation"
+   ],
+   "title": "ScoreExplanation",
+   "type": "object"
+  }
+ },
+ "properties": {
+  "ats_issues": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Ats Issues",
+   "type": "array"
+  },
+  "ats_score": {
+   "title": "Ats Score",
+   "type": "integer"
+  },
+  "improvement_suggestions": {
+   "items": {
+    "$ref": "#/$defs/ImprovementSuggestion"
+   },
+   "title": "Improvement Suggestions",
+   "type": "array"
+  },
+  "job_intelligence": {
+   "$ref": "#/$defs/JobIntelligence"
+  },
+  "keyword_match": {
+   "title": "Keyword Match",
+   "type": "integer"
+  },
+  "matched_skills": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Matched Skills",
+   "type": "array"
+  },
+  "missing_skills": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Missing Skills",
+   "type": "array"
+  },
+  "overall_score": {
+   "title": "Overall Score",
+   "type": "integer"
+  },
+  "recommendations": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Recommendations",
+   "type": "array"
+  },
+  "recruiter_summary": {
+   "title": "Recruiter Summary",
+   "type": "string"
+  },
+  "resume_xray": {
+   "items": {
+    "$ref": "#/$defs/ResumeXRayItem"
+   },
+   "title": "Resume Xray",
+   "type": "array"
+  },
+  "score_explanation": {
+   "$ref": "#/$defs/ScoreExplanation"
+  },
+  "semantic_similarity": {
+   "title": "Semantic Similarity",
+   "type": "integer"
+  }
+ },
+ "required": [
+  "overall_score",
+  "semantic_similarity",
+  "keyword_match",
+  "ats_score",
+  "matched_skills",
+  "missing_skills",
+  "ats_issues",
+  "recommendations",
+  "recruiter_summary",
+  "score_explanation",
+  "resume_xray",
+  "job_intelligence",
+  "improvement_suggestions"
+ ],
+ "title": "AnalyzeResponse",
+ "type": "object"
+}

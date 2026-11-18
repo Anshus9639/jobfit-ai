@@ -4,8 +4,10 @@ An AI/NLP resume-to-job-description match analyzer. Upload a PDF resume and past
 description — JobFit AI extracts skills, computes semantic similarity, checks basic ATS
 signals, and returns a match score along with a full breakdown of *why* you got that score.
 
-No database. No authentication. No paid APIs. No external LLM calls — all NLP runs locally
-using `sentence-transformers` (all-MiniLM-L6-v2) and scikit-learn.
+No database. No authentication. No LLM calls. Keyword, skill and ATS analysis run locally in
+pure Python; the semantic-similarity signal uses a hosted text-embedding API (default:
+Hugging Face `sentence-transformers/all-MiniLM-L6-v2`) so the server stays small enough for
+Render's 512 MB free tier.
 
 ## Features
 
@@ -33,8 +35,10 @@ using `sentence-transformers` (all-MiniLM-L6-v2) and scikit-learn.
 overall_score = 40% semantic similarity + 40% keyword/skill match + 20% ATS signals
 ```
 
-- **Semantic similarity** — cosine similarity between sentence-transformer embeddings of
-  the full resume and job description text.
+- **Semantic similarity** — cosine similarity between embeddings of the resume and job
+  description text, fetched from the configured embedding provider. If the provider is
+  unavailable the analysis returns an error (`503`/`504`) — a semantic score is never
+  estimated or defaulted.
 - **Keyword match** — overlap between a canonical skills dictionary extracted from both
   texts.
 - **ATS signals** — heuristic checks for structural sections (contact info, skills,
@@ -87,12 +91,17 @@ cd backend
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # adjust ALLOWED_ORIGINS if needed
+cp .env.example .env            # set HF_TOKEN (see below); adjust ALLOWED_ORIGINS if needed
+set -a; source .env; set +a     # the app reads real environment variables, not the file
 uvicorn app.main:app --reload --port 8000
 ```
 
-The first request (or app startup) downloads the `all-MiniLM-L6-v2` model (~90 MB) from
-Hugging Face and caches it locally — this only happens once.
+The server starts without any credentials (`/health` works, `/health/ready` reports
+`degraded`), but `POST /api/analyze` returns `503` until an embedding API key is set.
+Nothing is downloaded at startup — no ML model is loaded into the server process.
+
+Run the tests with `pip install -r requirements-dev.txt && pytest` (no network or API key
+needed). `python scripts/measure_memory.py` measures the server's real memory under load.
 
 Backend runs at `http://localhost:8000`. Interactive API docs at `http://localhost:8000/docs`.
 
@@ -120,12 +129,43 @@ everything automatically.
 2. **Root Directory:** `backend`
 3. **Build Command:** `pip install -r requirements.txt`
 4. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. **Environment Variables:** add `ALLOWED_ORIGINS` set to your Vercel frontend URL once
-   deployed (e.g. `https://your-project.vercel.app`). Use `*` initially if you want to test
-   before the frontend is deployed.
+5. **Environment Variables:** add `HF_TOKEN` (a Hugging Face access token — see below) and
+   `ALLOWED_ORIGINS` set to your Vercel frontend URL once deployed (e.g.
+   `https://your-project.vercel.app`). Use `*` initially if you want to test before the
+   frontend is deployed.
+6. **Health Check Path:** `/health`
 
-> Free Render instances spin down after inactivity — the first request after idle can take
-> 30-60 seconds while the instance wakes up and the model loads.
+**Embedding provider setup.** Create a Hugging Face token at
+<https://huggingface.co/settings/tokens> (fine-grained, with permission to call Inference
+Providers) and store it as the `HF_TOKEN` secret in Render — never commit it.
+
+> **Cost:** per Hugging Face's pricing page, free accounts get **no** Inference Providers
+> credits — you need purchased credits or PRO. Embedding calls for this app are tiny, but
+> they are not free on a free HF account. A zero-cost alternative is Google's Gemini API,
+> whose standard free tier lists the embedding models as free of charge: set
+> `EMBEDDING_PROVIDER=gemini` and `GEMINI_API_KEY`. Different models give different
+> similarity distributions, so semantic scores shift versus `all-MiniLM-L6-v2`; and resume
+> text is sent to whichever provider you choose, so review its data-use terms.
+> Always re-check current pricing and limits before relying on a free tier.
+
+To switch provider set `EMBEDDING_PROVIDER` (`huggingface` or `gemini`), the matching key
+(`HF_TOKEN` / `GEMINI_API_KEY`) and, if needed, `EMBEDDING_MODEL` / `EMBEDDING_API_URL`.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `EMBEDDING_PROVIDER` | `huggingface` | `huggingface` or `gemini` |
+| `HF_TOKEN` / `GEMINI_API_KEY` | — | Provider API key (secret) |
+| `EMBEDDING_MODEL` | provider default | Model id |
+| `EMBEDDING_API_URL` | provider default | Override the endpoint |
+| `EMBEDDING_TIMEOUT_SECONDS` | `10` | Per-attempt timeout |
+| `EMBEDDING_TOTAL_TIMEOUT_SECONDS` | `25` | Deadline across all retries |
+| `EMBEDDING_MAX_RETRIES` | `2` | Retries on timeouts / 429 / 5xx |
+| `MAX_CONCURRENT_ANALYSES` | `2` | Analyses running at once |
+| `MAX_WAITING_ANALYSES` | `4` | Extra requests allowed to queue (others get `503`) |
+| `MAX_PDF_PAGES` | `15` | Page limit per resume |
+
+> Free Render instances spin down after inactivity — the first request after idle takes
+> roughly 30-60 seconds while the instance wakes up (no model loads any more).
 
 ### Frontend → Vercel
 
@@ -241,5 +281,11 @@ and `npm run build` process these correctly regardless.
   responsibilities — they either reword existing text using only your own wording, or
   return a recommendation instead of a rewrite when there isn't enough information to
   safely generate one.
-- All matching happens in-memory on each request; nothing is persisted or logged beyond
-  the process lifetime.
+- Resume and job-description text is sent to the configured embedding provider (truncated
+  to 6,000 characters each) to compute the semantic score. Nothing is stored by this app,
+  and resume text is never logged.
+- When the embedding provider is down, rate-limited or misconfigured, `/api/analyze`
+  fails with a clear `503`/`504` message rather than returning a partial or estimated score.
+- Under load the server returns `503` with a `Retry-After` header instead of queueing
+  unboundedly. Request bodies over ~5.1 MB get `413`.
+- Everything else happens in-memory per request; nothing is persisted.

@@ -1,0 +1,7 @@
+Data Scientist
+
+Requirements:
+- 5+ years of experience in Python, Pandas, NumPy and Scikit-learn
+- Experience with Machine Learning, Deep Learning, TensorFlow and PyTorch
+- Strong SQL, AWS and GCP skills
+- Experience with NLP or Computer Vision
