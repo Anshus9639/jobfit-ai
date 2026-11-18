@@ -156,13 +156,23 @@ To switch provider set `EMBEDDING_PROVIDER` (`huggingface` or `gemini`), the mat
 | `EMBEDDING_PROVIDER` | `huggingface` | `huggingface` or `gemini` |
 | `HF_TOKEN` / `GEMINI_API_KEY` | — | Provider API key (secret) |
 | `EMBEDDING_MODEL` | provider default | Model id |
-| `EMBEDDING_API_URL` | provider default | Override the endpoint |
-| `EMBEDDING_TIMEOUT_SECONDS` | `10` | Per-attempt timeout |
+| `EMBEDDING_API_URL` | provider default | Override the endpoint. Must be `https://` (plain `http://` only for localhost), with no credentials in the URL |
+| `EMBEDDING_TIMEOUT_SECONDS` | `10` | Hard wall-clock limit per attempt (connect through full body) |
 | `EMBEDDING_TOTAL_TIMEOUT_SECONDS` | `25` | Deadline across all retries |
-| `EMBEDDING_MAX_RETRIES` | `2` | Retries on timeouts / 429 / 5xx |
+| `EMBEDDING_MAX_RETRIES` | `2` | Retries on timeouts / 429 / 5xx (each retry spends provider quota) |
+| `EMBEDDING_MAX_RESPONSE_BYTES` | `1048576` | Largest provider response accepted (streamed and capped) |
 | `MAX_CONCURRENT_ANALYSES` | `2` | Analyses running at once |
 | `MAX_WAITING_ANALYSES` | `4` | Extra requests allowed to queue (others get `503`) |
 | `MAX_PDF_PAGES` | `15` | Page limit per resume |
+| `RATE_LIMIT_PER_CLIENT` | `10` | Analyses one client may start per window (`429`); `0` disables |
+| `RATE_LIMIT_GLOBAL` | `100` | Analyses the whole service may start per window (`503`) — the provider-quota guard; `0` disables |
+| `RATE_LIMIT_WINDOW_SECONDS` | `600` | Sliding window length |
+| `TRUSTED_PROXY_COUNT` | `1` | Reverse proxies in front of the app that append to `X-Forwarded-For` (Render: 1). Set `0` if clients connect directly |
+
+Malformed or out-of-range values (for example `EMBEDDING_MAX_RETRIES=lots`) stop the app at
+startup with a message naming the variable (never its value). Admission control runs before
+the upload is parsed: when all analysis slots are busy, extra requests get an immediate `503`
+with `Retry-After` and their body is not read. Rate-limit state is in memory and per process.
 
 > Free Render instances spin down after inactivity — the first request after idle takes
 > roughly 30-60 seconds while the instance wakes up (no model loads any more).

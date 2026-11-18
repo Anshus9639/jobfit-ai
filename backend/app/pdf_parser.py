@@ -7,6 +7,7 @@ many pages, or yield an unreasonable amount of text, and always releases the
 document (and PyMuPDF's internal cache) even when parsing fails.
 """
 
+import threading
 from typing import Optional
 
 import fitz  # PyMuPDF
@@ -15,6 +16,12 @@ from fastapi import HTTPException
 from .config import load_analysis_limits
 
 _PDF_MAGIC = b"%PDF-"
+
+# PyMuPDF/MuPDF is not thread-safe: its global context and object store are shared, and
+# extraction runs in worker threads (asyncio.to_thread). Every use of the library, from
+# open to close/store_shrink, happens under this lock. Cost: PDF parsing is serialized,
+# which is fine because it is short and the analysis gate already bounds concurrency.
+_PYMUPDF_LOCK = threading.Lock()
 
 
 def extract_text_from_pdf(
@@ -36,41 +43,43 @@ def extract_text_from_pdf(
     if _PDF_MAGIC not in file_bytes[:1024]:
         raise HTTPException(status_code=400, detail="Resume must be a PDF file.")
 
-    try:
-        doc = fitz.open(stream=file_bytes, filetype="pdf")
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Could not read PDF file: {exc}")
+    with _PYMUPDF_LOCK:
+        try:
+            doc = fitz.open(stream=file_bytes, filetype="pdf")
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail="Could not read PDF file. It may be corrupted.")
 
-    try:
-        if doc.needs_pass:
-            raise HTTPException(
-                status_code=400,
-                detail="Password-protected PDFs are not supported. Please upload an unprotected copy.",
-            )
-        if doc.page_count > max_pages:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Resume PDF has too many pages ({doc.page_count}; max {max_pages}).",
-            )
-
-        text_parts = []
-        total_chars = 0
-        for page in doc:
-            page_text = page.get_text()
-            total_chars += len(page_text)
-            if total_chars > max_chars:
+        try:
+            if doc.needs_pass:
                 raise HTTPException(
                     status_code=400,
-                    detail="Resume PDF contains too much text to analyze.",
+                    detail="Password-protected PDFs are not supported. Please upload an unprotected copy.",
                 )
-            text_parts.append(page_text)
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Could not read PDF file: {exc}")
-    finally:
-        doc.close()
-        fitz.TOOLS.store_shrink(100)  # drop PyMuPDF's internal object cache
+            if doc.page_count > max_pages:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Resume PDF has too many pages ({doc.page_count}; max {max_pages}).",
+                )
+
+            text_parts = []
+            total_chars = 0
+            for page in doc:
+                page_text = page.get_text()
+                total_chars += len(page_text)
+                if total_chars > max_chars:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Resume PDF contains too much text to analyze.",
+                    )
+                text_parts.append(page_text)
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail="Could not read PDF file. It may be corrupted.")
+        finally:
+            doc.close()
+            fitz.TOOLS.store_shrink(100)  # drop PyMuPDF's internal object cache
+
 
     full_text = "\n".join(text_parts).strip()
 

@@ -3,6 +3,9 @@ limits.py
 Request-level resource protection for a 512 MB host:
 
   * AnalysisGate       -- bounds how many analyses run at once and how many may queue.
+  * AdmissionControlMiddleware -- takes a gate slot BEFORE the body is read, so FastAPI's
+                          multipart parsing (which spools every upload before the route runs)
+                          is bounded in aggregate, not just per request.
   * BodySizeLimitMiddleware -- rejects oversized request bodies before they are buffered.
 """
 
@@ -39,15 +42,29 @@ class AnalysisGate:
         if self._in_system >= self.capacity:
             raise ServerBusy()
         self._in_system += 1
+        # Not wait_for(acquire()): on a timeout/cancel race it can finish acquiring and still
+        # raise, leaking a permit forever. Own the task so a late permit is always returned.
+        task = asyncio.ensure_future(self._semaphore.acquire())
         try:
-            await asyncio.wait_for(self._semaphore.acquire(), self.limits.wait_timeout_seconds)
-        except asyncio.TimeoutError:
-            self._in_system -= 1
-            raise ServerBusy()
+            done, _ = await asyncio.wait({task}, timeout=self.limits.wait_timeout_seconds)
         except BaseException:
+            await self._abandon(task)
             self._in_system -= 1
             raise
+        if task not in done:
+            await self._abandon(task)
+            self._in_system -= 1
+            raise ServerBusy()
         return self
+
+    async def _abandon(self, task: "asyncio.Future") -> None:
+        task.cancel()
+        try:
+            await task
+        except BaseException:
+            pass
+        if task.done() and not task.cancelled() and task.exception() is None:
+            self._semaphore.release()  # the permit was granted just before the cancel landed
 
     async def __aexit__(self, exc_type, exc, tb):
         self._semaphore.release()
@@ -155,3 +172,42 @@ class BodySizeLimitMiddleware:
             }
         )
         await send({"type": "http.response.body", "body": body})
+
+
+class AdmissionControlMiddleware:
+    """
+    Pure-ASGI admission control for POST `path`. A gate slot is taken before the app is
+    called -- i.e. before Starlette reads and spools the multipart body -- and held until the
+    response is finished. Requests beyond capacity get an immediate 503 + Retry-After
+    without their body being read. Install inside CORS (so the 503 carries CORS headers)
+    and outside BodySizeLimitMiddleware.
+    """
+
+    def __init__(self, app, path: str = "/api/analyze"):
+        self.app = app
+        self.path = path
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] != self.path:
+            await self.app(scope, receive, send)
+            return
+        try:
+            async with get_gate():
+                await self.app(scope, receive, send)
+        except ServerBusy as busy:
+            body = json.dumps(
+                {"detail": "The server is busy analyzing other resumes. Please try again in a few seconds."}
+            ).encode()
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 503,
+                    "headers": [
+                        (b"content-type", b"application/json"),
+                        (b"content-length", str(len(body)).encode()),
+                        (b"retry-after", str(busy.retry_after_seconds).encode()),
+                        (b"connection", b"close"),
+                    ],
+                }
+            )
+            await send({"type": "http.response.body", "body": body})

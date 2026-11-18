@@ -118,6 +118,8 @@ def main():
 
     env = {
         **os.environ,
+        "RATE_LIMIT_PER_CLIENT": "0",
+        "RATE_LIMIT_GLOBAL": "0",
         "EMBEDDING_PROVIDER": "huggingface",
         "HF_TOKEN": "local-measurement-token",
         "EMBEDDING_API_URL": f"http://127.0.0.1:{provider_port}/embed",

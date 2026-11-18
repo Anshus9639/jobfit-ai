@@ -11,16 +11,24 @@ Design rules:
     needs credentials; failures surface per request, as typed errors.
   * A failed or invalid embedding call raises. It is NEVER replaced by a default,
     fallback, or estimated similarity score.
-  * Retries are bounded by both an attempt count and an overall deadline.
-  * Resume/job text and API keys are never logged.
+  * Every attempt has a hard wall-clock deadline (httpx timeouts alone are per-operation,
+    so a provider that keeps trickling bytes could otherwise hold a request forever), and
+    retries are bounded by both an attempt count and an overall deadline.
+  * Provider responses are streamed and capped before they are buffered.
+  * Resume/job text, API keys and upstream response bodies are never logged: error
+    details carry only a status code or an error class.
 """
 
 import asyncio
+import ipaddress
+import json
 import logging
 import math
 import random
+import re
 import threading
 from typing import Any, Callable, Dict, List, Optional, Tuple
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -31,6 +39,11 @@ logger = logging.getLogger("jobfit.embeddings")
 _MAX_BACKOFF_SECONDS = 4.0
 _MAX_RETRY_AFTER_SECONDS = 120.0
 _RETRYABLE_STATUS = {500, 502, 503, 504}
+_ERROR_BODY_PEEK_BYTES = 4096  # most we read from a non-200 body (only for HF's "estimated_time")
+_MIN_ATTEMPT_SECONDS = 0.25  # do not start an attempt with less budget than this
+_MAX_DETAIL_CHARS = 200
+_MODEL_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*(?:/[A-Za-z0-9][A-Za-z0-9._-]*)*")
+_API_KEY_RE = re.compile(r"[\x21-\x7e]{1,512}")  # visible ASCII only: no spaces/control chars
 
 
 # ---------------------------------------------------------------------------
@@ -43,6 +56,9 @@ class EmbeddingError(Exception):
     retryable = False
 
     def __init__(self, detail: str = "", *, retry_after: Optional[float] = None):
+        # `detail` is written to logs, so it is bounded and must only ever be built from
+        # our own text, status codes and error-class names -- never from upstream bodies.
+        detail = detail[:_MAX_DETAIL_CHARS]
         super().__init__(detail or self.public_message)
         self.detail = detail
         self.retry_after = retry_after
@@ -142,8 +158,35 @@ PROVIDERS: Dict[str, Tuple[Callable[..., Request], Callable[[Any], Any]]] = {
 }
 
 
+def _to_unit_vector(vec: Any) -> List[float]:
+    """
+    Return `vec` scaled to unit length, or raise EmbeddingResponseError.
+
+    The vector is first divided by its largest absolute component, so every component
+    is in [-1, 1] and squaring/summing cannot overflow (naively, [1e200] has an infinite
+    norm) or underflow to zero (naively, [1e-200] looks like a zero vector).
+    """
+    try:
+        values = [float(x) for x in vec]  # OverflowError for integers beyond float range
+    except (OverflowError, TypeError, ValueError):
+        raise EmbeddingResponseError("vector contains an unusable value") from None
+    if not values:
+        raise EmbeddingResponseError("vector is empty")
+    if not all(math.isfinite(v) for v in values):
+        raise EmbeddingResponseError("vector contains a non-finite value")
+    scale = max(abs(v) for v in values)
+    if scale == 0.0:
+        raise EmbeddingResponseError("vector has zero norm")
+    scaled = [v / scale for v in values]
+    norm = math.sqrt(math.fsum(v * v for v in scaled))  # in [1, sqrt(len)]
+    return [v / norm for v in scaled]
+
+
 def validate_vectors(raw: Any, expected_count: int) -> List[List[float]]:
-    """Strictly validate provider output; raise EmbeddingResponseError on anything odd."""
+    """
+    Strictly validate provider output and return unit-length vectors.
+    Raises EmbeddingResponseError on anything odd.
+    """
     if not isinstance(raw, list) or len(raw) != expected_count:
         raise EmbeddingResponseError(f"expected {expected_count} vectors")
 
@@ -151,23 +194,54 @@ def validate_vectors(raw: Any, expected_count: int) -> List[List[float]]:
     for vec in raw:
         if not isinstance(vec, list) or not vec:
             raise EmbeddingResponseError("vector is not a non-empty list (token-level output?)")
-        for x in vec:
-            if isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x):
-                raise EmbeddingResponseError("vector contains a non-numeric or non-finite value")
-        vectors.append([float(x) for x in vec])
+        if any(isinstance(x, bool) or not isinstance(x, (int, float)) for x in vec):
+            raise EmbeddingResponseError("vector contains a non-numeric value")
+        vectors.append(_to_unit_vector(vec))
 
     if len({len(v) for v in vectors}) != 1:
         raise EmbeddingResponseError("vectors have different dimensions")
-    if any(math.sqrt(sum(x * x for x in v)) == 0.0 for v in vectors):
-        raise EmbeddingResponseError("vector has zero norm")
     return vectors
 
 
 def cosine_similarity(a: List[float], b: List[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x * x for x in a))
-    norm_b = math.sqrt(sum(y * y for y in b))
-    return dot / (norm_a * norm_b)
+    """
+    Cosine similarity in [-1, 1]. Inputs are normalized first, so the result does not
+    depend on their scale; a non-finite or undefined result raises instead of being
+    passed on (a NaN would otherwise be clamped into a perfect score).
+    """
+    unit_a, unit_b = _to_unit_vector(a), _to_unit_vector(b)
+    if len(unit_a) != len(unit_b):
+        raise EmbeddingResponseError("vectors have different dimensions")
+    dot = math.fsum(x * y for x, y in zip(unit_a, unit_b))
+    if not math.isfinite(dot):
+        raise EmbeddingResponseError("similarity is not a finite number")
+    return max(-1.0, min(1.0, dot))
+
+
+def _is_loopback_host(host: str) -> bool:
+    if host.lower() == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def _url_problem(url: str) -> Optional[str]:
+    """Why an EMBEDDING_API_URL override is unacceptable, or None. The API key is sent to it."""
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname
+        parts.port  # noqa: B018 - raises ValueError for an invalid port
+    except ValueError:
+        return "EMBEDDING_API_URL is not a valid URL"
+    if parts.scheme not in ("https", "http") or not host:
+        return "EMBEDDING_API_URL must be an absolute https:// URL"
+    if parts.username is not None or parts.password is not None:
+        return "EMBEDDING_API_URL must not contain credentials"
+    if parts.scheme == "http" and not _is_loopback_host(host):
+        return "EMBEDDING_API_URL must use https:// (plain http is only allowed for localhost)"
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -198,19 +272,32 @@ class EmbeddingClient:
 
     @staticmethod
     def _default_http_client() -> httpx.AsyncClient:
-        return httpx.AsyncClient(limits=httpx.Limits(max_connections=10, max_keepalive_connections=2))
+        # Never follow redirects: the API key travels in a request header and must not be
+        # forwarded to wherever an upstream (or a misconfigured URL) points us next.
+        return httpx.AsyncClient(
+            limits=httpx.Limits(max_connections=10, max_keepalive_connections=2),
+            follow_redirects=False,
+        )
 
     # -- configuration ------------------------------------------------------
 
     def configuration_problem(self) -> Optional[str]:
         """Return why the client cannot be used, or None when it is ready. No network."""
+        # Messages name settings, never their values: they reach the logs and a value
+        # could be a credential or a URL containing one.
         cfg = self.settings
         if cfg.provider not in PROVIDERS:
-            return f"unknown EMBEDDING_PROVIDER '{cfg.provider}' (supported: {', '.join(sorted(PROVIDERS))})"
+            return f"unknown EMBEDDING_PROVIDER (supported: {', '.join(sorted(PROVIDERS))})"
         if not cfg.api_key:
             return f"no API key set for provider '{cfg.provider}'"
+        if not _API_KEY_RE.fullmatch(cfg.api_key):
+            return "the embedding API key contains whitespace, control or non-ASCII characters"
         if not cfg.model and not cfg.api_url:
             return "no EMBEDDING_MODEL set"
+        if cfg.model and (not _MODEL_ID_RE.fullmatch(cfg.model) or len(cfg.model) > 128):
+            return "EMBEDDING_MODEL contains characters that are not valid in a model id"
+        if cfg.api_url:
+            return _url_problem(cfg.api_url)
         return None
 
     def ensure_configured(self) -> None:
@@ -241,6 +328,8 @@ class EmbeddingClient:
         cfg = self.settings
         build_request, parse = PROVIDERS[cfg.provider]
         url, headers, body = build_request(cfg, [t[: cfg.max_input_chars] for t in texts])
+        # Ask for an uncompressed body so the byte cap below bounds what we really buffer.
+        headers = {**headers, "Accept-Encoding": "identity"}
 
         http = await self._get_http()
         loop = asyncio.get_running_loop()
@@ -250,11 +339,11 @@ class EmbeddingClient:
 
         for attempt in range(attempts):
             remaining = deadline - loop.time()
-            if remaining <= 0:
-                break
+            if remaining < _MIN_ATTEMPT_SECONDS:
+                break  # too little time left for a meaningful attempt; report the last real error
             result = await self._attempt(
                 http, url, headers, body, parse, len(texts), min(cfg.timeout_seconds, remaining)
-            )
+            )  # `min(...)` is this attempt's hard wall-clock budget
             if not isinstance(result, EmbeddingError):
                 return result  # success: validated vectors
             last_error = result
@@ -275,48 +364,81 @@ class EmbeddingClient:
 
         raise last_error
 
-    async def _attempt(self, http, url, headers, body, parse, expected, timeout):
-        """One HTTP attempt. Returns vectors on success, or an EmbeddingError instance."""
+    async def _attempt(self, http, url, headers, body, parse, expected, budget):
+        """
+        One attempt with a hard wall-clock deadline of `budget` seconds covering connect,
+        send, headers AND the whole body. (httpx's own timeouts apply to each network
+        operation separately, so on their own they cannot stop a response that keeps
+        trickling bytes.) Returns vectors on success, or an EmbeddingError instance.
+        """
         try:
-            response = await http.post(url, headers=headers, json=body, timeout=timeout)
+            return await asyncio.wait_for(
+                self._exchange(http, url, headers, body, parse, expected, budget), timeout=budget
+            )
+        except asyncio.TimeoutError:
+            return EmbeddingTimeout(f"no complete response within {budget:.1f}s")
+
+    async def _exchange(self, http, url, headers, body, parse, expected, budget):
+        cap = self.settings.max_response_bytes
+        try:
+            async with http.stream("POST", url, headers=headers, json=body, timeout=budget) as response:
+                status = response.status_code
+                if status == 200:
+                    raw = await self._read_capped(response, cap)
+                    try:
+                        return validate_vectors(parse(json.loads(raw)), expected)
+                    except (ValueError, RecursionError):  # not JSON / not UTF-8 / absurdly nested
+                        return EmbeddingResponseError("response body is not valid JSON")
+
+                # Error responses are not buffered: the status alone decides what we do. The
+                # one exception is a small peek at a 503 body for Hugging Face's load estimate.
+                retry_after = _parse_retry_after(response.headers.get("retry-after"))
+                if status in (401, 403):
+                    return EmbeddingAuthError(f"HTTP {status}")
+                if status == 429:
+                    return EmbeddingRateLimited("HTTP 429", retry_after=retry_after)
+                if status in _RETRYABLE_STATUS:
+                    if status == 503 and retry_after is None:
+                        retry_after = await self._estimated_load_time(response)
+                    return EmbeddingProviderError(f"HTTP {status}", retryable=True, retry_after=retry_after)
+                return EmbeddingProviderError(f"HTTP {status}", retryable=False)
+        except EmbeddingError as exc:  # e.g. oversized body from _read_capped
+            return exc
         except httpx.TimeoutException:
-            return EmbeddingTimeout(f"no response within {timeout:.1f}s")
+            return EmbeddingTimeout(f"no response within {budget:.1f}s")
+        except httpx.DecodingError:
+            return EmbeddingResponseError("response has an invalid content-encoding")
         except httpx.TransportError as exc:
             return EmbeddingProviderError(f"network error: {type(exc).__name__}", retryable=True)
-
-        status = response.status_code
-        if status == 200:
-            try:
-                return validate_vectors(parse(response.json()), expected)
-            except EmbeddingError as exc:
-                return exc
-            except ValueError:
-                return EmbeddingResponseError("response body is not valid JSON")
-
-        retry_after = _parse_retry_after(response.headers.get("retry-after"))
-        snippet = self._safe_snippet(response)
-        if status in (401, 403):
-            return EmbeddingAuthError(f"HTTP {status}")
-        if status == 429:
-            return EmbeddingRateLimited(f"HTTP 429 {snippet}", retry_after=retry_after)
-        if status in _RETRYABLE_STATUS:
-            if status == 503 and retry_after is None:
-                retry_after = self._estimated_load_time(response)  # HF "model is loading"
-            return EmbeddingProviderError(f"HTTP {status} {snippet}", retryable=True, retry_after=retry_after)
-        return EmbeddingProviderError(f"HTTP {status} {snippet}", retryable=False)
-
-    def _safe_snippet(self, response: httpx.Response) -> str:
-        text = response.text[:120].replace("\n", " ")
-        key = self.settings.api_key
-        return text.replace(key, "***") if key else text
+        except httpx.HTTPError as exc:
+            return EmbeddingProviderError(f"request error: {type(exc).__name__}", retryable=False)
 
     @staticmethod
-    def _estimated_load_time(response: httpx.Response) -> Optional[float]:
+    async def _read_capped(response: httpx.Response, limit: int) -> bytes:
+        """Read the decoded body, stopping as soon as it exceeds `limit` bytes."""
+        declared = response.headers.get("content-length")
+        if declared is not None and declared.isdigit() and int(declared) > limit:
+            raise EmbeddingResponseError(f"response larger than {limit} bytes")
+        buffer = bytearray()
+        async for chunk in response.aiter_bytes():
+            buffer += chunk
+            if len(buffer) > limit:
+                raise EmbeddingResponseError(f"response larger than {limit} bytes")
+        return bytes(buffer)
+
+    @staticmethod
+    async def _estimated_load_time(response: httpx.Response) -> Optional[float]:
+        """Hugging Face's 503 'model is loading' body carries {"estimated_time": seconds}."""
         try:
-            value = response.json().get("estimated_time")
-        except (ValueError, AttributeError):
+            buffer = bytearray()
+            async for chunk in response.aiter_bytes():
+                buffer += chunk
+                if len(buffer) >= _ERROR_BODY_PEEK_BYTES:
+                    return None  # too big to be the tiny JSON we are looking for
+            value = json.loads(bytes(buffer)).get("estimated_time")
+        except (ValueError, AttributeError, RecursionError, httpx.HTTPError):
             return None
-        if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value):
             return max(0.0, min(float(value), _MAX_RETRY_AFTER_SECONDS))
         return None
 

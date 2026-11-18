@@ -14,7 +14,7 @@ import fitz
 import httpx
 import pytest
 
-from app import embeddings, limits
+from app import embeddings, limits, ratelimit
 from app.config import EmbeddingSettings
 from app.embeddings import EmbeddingClient
 
@@ -124,14 +124,22 @@ def _isolated_singletons(monkeypatch):
         "EMBEDDING_PROVIDER", "EMBEDDING_API_KEY", "EMBEDDING_MODEL", "EMBEDDING_API_URL",
         "HF_TOKEN", "HUGGINGFACE_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY",
         "MAX_CONCURRENT_ANALYSES", "MAX_WAITING_ANALYSES", "ANALYSIS_WAIT_TIMEOUT_SECONDS",
-        "MAX_PDF_PAGES", "MAX_RESUME_CHARS",
+        "MAX_PDF_PAGES", "MAX_RESUME_CHARS", "EMBEDDING_TIMEOUT_SECONDS",
+        "EMBEDDING_TOTAL_TIMEOUT_SECONDS", "EMBEDDING_MAX_RETRIES", "EMBEDDING_MAX_INPUT_CHARS",
+        "EMBEDDING_MAX_RESPONSE_BYTES", "RATE_LIMIT_PER_CLIENT", "RATE_LIMIT_GLOBAL",
+        "RATE_LIMIT_WINDOW_SECONDS", "TRUSTED_PROXY_COUNT",
     ):
         monkeypatch.delenv(var, raising=False)
+    # Rate limits are off unless a test opts in, so unrelated tests can post freely.
+    monkeypatch.setenv("RATE_LIMIT_PER_CLIENT", "0")
+    monkeypatch.setenv("RATE_LIMIT_GLOBAL", "0")
     embeddings.set_embedding_client(None)
     limits.reset_gate()
+    ratelimit.reset_rate_limiter()
     yield
     embeddings.set_embedding_client(None)
     limits.reset_gate()
+    ratelimit.reset_rate_limiter()
 
 
 def install_provider(fake: FakeProvider, **settings_overrides) -> EmbeddingClient:
