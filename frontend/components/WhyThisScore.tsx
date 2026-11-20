@@ -17,9 +17,9 @@ export default function WhyThisScore({ data }: WhyThisScoreProps) {
         className="w-full flex items-center justify-between text-left"
         aria-expanded={open}
       >
-        <h2 className="font-semibold text-slate-800">Why did I get this score?</h2>
+        <h2 className="font-medium text-neutral-100">Why this score</h2>
         <span
-          className={`text-slate-400 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          className={`text-neutral-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         >
           ▾
         </span>
@@ -27,17 +27,17 @@ export default function WhyThisScore({ data }: WhyThisScoreProps) {
 
       {open && (
         <div className="mt-4 space-y-5 animate-[fadeIn_0.2s_ease-out]">
-          <p className="text-sm text-slate-600 leading-relaxed">{data.explanation}</p>
+          <p className="text-sm leading-6 text-neutral-400">{data.explanation}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-2">
+              <p className="eyebrow mb-3">
                 Strengths
               </p>
               <ul className="space-y-1.5">
                 {data.strengths.map((s, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                    <span className="text-emerald-500 font-semibold mt-0.5 shrink-0">✓</span>
+                  <li key={i} className="flex items-start gap-2.5 text-sm leading-6 text-neutral-400">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-neutral-200" />
                     {s}
                   </li>
                 ))}
@@ -45,13 +45,13 @@ export default function WhyThisScore({ data }: WhyThisScoreProps) {
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 mb-2">
-                Potential gaps
+              <p className="eyebrow mb-3">
+                Areas to improve
               </p>
               <ul className="space-y-1.5">
                 {data.gaps.map((g, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                    <span className="text-amber-500 font-semibold mt-0.5 shrink-0">⚠</span>
+                  <li key={i} className="flex items-start gap-2.5 text-sm leading-6 text-neutral-400">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-neutral-600" />
                     {g}
                   </li>
                 ))}

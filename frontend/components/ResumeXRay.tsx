@@ -4,19 +4,19 @@ interface ResumeXRayProps {
   items: ResumeXRayItem[];
 }
 
-const STATUS_STYLES: Record<XRayStatus, { icon: string; className: string }> = {
-  detected: { icon: "✓", className: "text-emerald-600" },
-  warning: { icon: "⚠", className: "text-amber-600" },
-  missing: { icon: "✕", className: "text-red-500" },
+const STATUS_STYLES: Record<XRayStatus, { symbol: string; className: string }> = {
+  detected: { symbol: "Present", className: "border-neutral-500/40 text-neutral-200" },
+  warning: { symbol: "Review", className: "border-white/[0.12] text-neutral-400" },
+  missing: { symbol: "Missing", className: "border-neutral-700 text-neutral-500" },
 };
 
 export default function ResumeXRay({ items }: ResumeXRayProps) {
   return (
     <div className="card">
       <div className="mb-4">
-        <h2 className="font-semibold text-slate-800">Resume X-Ray 🔍</h2>
-        <p className="text-xs text-slate-400 mt-0.5">
-          ATS-style analysis of what was detected in your resume — not a real ATS prediction.
+        <h2 className="font-medium text-neutral-100">Resume structure</h2>
+        <p className="mt-1 text-xs text-neutral-500">
+          ATS-style signals detected in your resume.
         </p>
       </div>
 
@@ -25,10 +25,10 @@ export default function ResumeXRay({ items }: ResumeXRayProps) {
           const style = STATUS_STYLES[item.status] ?? STATUS_STYLES.warning;
           return (
             <div key={i} className="flex items-start gap-2.5">
-              <span className={`font-semibold leading-5 ${style.className}`}>{style.icon}</span>
+              <span className={`rounded border px-1.5 py-0.5 text-[9px] uppercase tracking-wider ${style.className}`}>{style.symbol}</span>
               <div>
-                <p className="text-sm text-slate-700">{item.label}</p>
-                {item.note && <p className="text-xs text-slate-400 mt-0.5">{item.note}</p>}
+                <p className="text-sm text-neutral-300">{item.label}</p>
+                {item.note && <p className="mt-1 text-xs leading-5 text-neutral-600">{item.note}</p>}
               </div>
             </div>
           );

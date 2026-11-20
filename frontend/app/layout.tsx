@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "JobFit AI — Resume to Job Match Analyzer",
-  description: "See how closely your resume matches the job.",
+  description: "Find your fit. Know your worth.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen text-slate-900 antialiased">{children}</body>
+      <body className="min-h-screen bg-[#080808] text-neutral-100 antialiased">{children}</body>
     </html>
   );
 }

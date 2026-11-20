@@ -55,18 +55,12 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card mx-auto max-w-3xl space-y-6">
-      <div className="mb-2">
-        <p className="eyebrow">Start your analysis</p>
-        <h2 className="mt-2 text-xl font-semibold text-slate-900">Compare your fit in seconds</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Add your resume and the role you want to understand better.
-        </p>
-      </div>
-      <div>
-        <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Resume (PDF)
-        </label>
+    <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+      <div className="min-w-0">
+        <div className="mb-6">
+          <p className="eyebrow">Resume</p>
+          <p className="mt-2 text-sm text-neutral-500">PDF only · 5 MB maximum</p>
+        </div>
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -75,10 +69,16 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
           onDragLeave={() => setDragActive(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all ${
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+          }}
+          aria-label="Upload resume PDF"
+          className={`flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center outline-none transition duration-200 ${
             dragActive
-              ? "border-brand-500 bg-brand-50 shadow-inner"
-              : "border-slate-300 bg-slate-50/60 hover:border-brand-400 hover:bg-brand-50/50"
+              ? "border-neutral-300 bg-white/[0.06]"
+              : "border-white/[0.13] bg-[#111111] hover:border-white/[0.24] hover:bg-[#141414]"
           }`}
         >
           <input
@@ -89,27 +89,35 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
             onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
           />
           {resumeFile ? (
-            <div>
-              <p className="font-medium text-slate-800">{resumeFile.name}</p>
-              <p className="text-sm text-slate-500 mt-1">
-                {(resumeFile.size / 1024).toFixed(0)} KB — click or drop to replace
+            <div className="max-w-full">
+              <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
+                <span className="text-xs font-semibold text-neutral-300">PDF</span>
+              </div>
+              <p className="max-w-full truncate text-sm font-medium text-neutral-100">{resumeFile.name}</p>
+              <p className="mt-1.5 text-xs text-neutral-500">
+                {(resumeFile.size / 1024).toFixed(0)} KB · Ready to analyze
               </p>
             </div>
           ) : (
             <div>
-              <p className="font-medium text-slate-700">
-                Drag & drop your resume, or click to browse
-              </p>
-              <p className="text-sm text-slate-500 mt-1">PDF only, up to 5 MB</p>
+              <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-xl text-neutral-300">
+                +
+              </div>
+              <p className="text-sm font-medium text-neutral-200">Drop your resume here</p>
+              <p className="mt-1.5 text-xs text-neutral-500">or click to browse</p>
             </div>
           )}
         </div>
       </div>
 
-      <div>
+      <div className="min-w-0">
+        <div className="mb-6">
+          <p className="eyebrow">Job description</p>
+          <p className="mt-2 text-sm text-neutral-500">Include the role, requirements and responsibilities</p>
+        </div>
         <label
           htmlFor="job-description"
-          className="block text-sm font-semibold text-slate-700 mb-2"
+          className="sr-only"
         >
           Job Description
         </label>
@@ -117,25 +125,26 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
           id="job-description"
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
-          rows={8}
+          rows={11}
           placeholder="Paste the full job description here..."
-          className="w-full resize-y rounded-xl border border-slate-300 bg-slate-50/60 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10"
+          className="field min-h-72 resize-y"
         />
+        {formError && (
+          <p role="alert" className="mt-3 rounded-lg border border-neutral-600/50 bg-neutral-900 px-3 py-2.5 text-sm text-neutral-300">
+            {formError}
+          </p>
+        )}
+        <button type="submit" disabled={loading} className="primary-button mt-4 w-full">
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neutral-500" />
+              Analyzing your fit
+            </span>
+          ) : (
+            "Analyze my resume"
+          )}
+        </button>
       </div>
-
-      {formError && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-          {formError}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-indigo-500 py-3 font-semibold text-white shadow-lg shadow-brand-500/20 transition hover:from-brand-700 hover:to-indigo-600 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
-      >
-        {loading ? "Analyzing your fit..." : "Analyze my resume"}
-      </button>
     </form>
   );
 }
