@@ -5,6 +5,7 @@ import UploadForm from "@/components/UploadForm";
 import Results from "@/components/Results";
 import { analyzeResume } from "@/lib/api";
 import { AnalyzeResult } from "@/lib/types";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 interface SavedAnalysis {
   id: string;
@@ -24,6 +25,57 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<SavedAnalysis[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [billingMessage, setBillingMessage] = useState<string | null>(null);
+  const [plan, setPlan] = useState<"free" | "pro">("free");
+
+  useEffect(() => {
+    const billing = new URLSearchParams(window.location.search).get("billing");
+    if (billing === "success") {
+      setBillingMessage("Subscription activated. Your account is now updating.");
+    } else if (billing === "cancelled") {
+      setBillingMessage("Checkout cancelled. No charge was made.");
+    }
+
+    const supabase = createSupabaseBrowserClient();
+    async function loadServerBillingStatus() {
+      const response = await fetch("/api/billing/status", { cache: "no-store" });
+      if (!response.ok) {
+        setPlan("free");
+        return;
+      }
+      const status = await response.json();
+      setPlan(status.plan === "pro" ? "pro" : "free");
+    }
+
+    async function loadProfile(userId: string) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("plan")
+        .eq("id", userId)
+        .maybeSingle();
+      setPlan(profile?.plan === "pro" ? "pro" : "free");
+      await loadServerBillingStatus();
+    }
+
+    supabase.auth.getUser().then(async ({ data, error }) => {
+      setUserEmail(error ? null : data.user?.email ?? null);
+      if (!error && data.user) {
+        await loadProfile(data.user.id);
+      } else {
+        setPlan("free");
+      }
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user.email ?? null);
+      if (session) {
+        void loadProfile(session.user.id);
+      } else {
+        setPlan("free");
+      }
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     try {
@@ -74,6 +126,34 @@ export default function Home() {
     window.localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
   }
 
+  async function handleSignOut() {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    setUserEmail(null);
+  }
+
+  async function openCheckout() {
+    setError(null);
+    const response = await fetch("/api/billing/checkout", { method: "POST" });
+    const data = await response.json();
+    if (!response.ok) {
+      setError(data.detail || "Unable to start checkout.");
+      return;
+    }
+    window.location.assign(data.url);
+  }
+
+  async function openBillingPortal() {
+    setError(null);
+    const response = await fetch("/api/billing/portal", { method: "POST" });
+    const data = await response.json();
+    if (!response.ok) {
+      setError(data.detail || "Unable to open billing settings.");
+      return;
+    }
+    window.location.assign(data.url);
+  }
+
   return (
     <main className="min-h-screen bg-[#080808]">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
@@ -93,12 +173,37 @@ export default function Home() {
             <button type="button" onClick={() => window.print()} className="secondary-button px-3.5 py-2">
               Export
             </button>
+            {userEmail && (
+              <button type="button" onClick={openBillingPortal} className="secondary-button hidden px-3.5 py-2 sm:inline-flex">
+                Billing
+              </button>
+            )}
             <button type="button" onClick={handleReset} className="secondary-button px-3.5 py-2">
               New analysis
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
+            {userEmail ? (
+              <div className="hidden items-center gap-2 sm:flex">
+                {plan === "pro" ? (
+                  <button type="button" onClick={openBillingPortal} className="primary-button px-3.5 py-2">
+                    Manage billing
+                  </button>
+                ) : (
+                  <button type="button" onClick={openCheckout} className="primary-button px-3.5 py-2">
+                    Upgrade
+                  </button>
+                )}
+                <button type="button" onClick={handleSignOut} className="secondary-button px-3.5 py-2">
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <a href="/auth" className="secondary-button hidden px-3.5 py-2 sm:inline-flex">
+                Sign in
+              </a>
+            )}
             <button
               type="button"
               onClick={() => setHistoryOpen(true)}
@@ -112,6 +217,15 @@ export default function Home() {
           </div>
         )}
       </nav>
+
+      {billingMessage && (
+        <div
+          role="status"
+          className="mx-auto mb-2 max-w-6xl rounded-xl border border-white/[0.10] bg-[#111111] px-4 py-3 text-sm text-neutral-300 sm:mx-auto"
+        >
+          {billingMessage}
+        </div>
+      )}
 
       {historyOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/70" role="dialog" aria-modal="true" aria-label="Analysis history">

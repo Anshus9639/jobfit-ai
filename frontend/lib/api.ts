@@ -1,4 +1,5 @@
 import { AnalyzeResult } from "./types";
+import { createSupabaseBrowserClient } from "./supabase-browser";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -10,8 +11,18 @@ export async function analyzeResume(
   formData.append("resume", resumeFile);
   formData.append("job_description", jobDescription);
 
+  const supabase = createSupabaseBrowserClient();
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (!accessToken) {
+    throw new Error("Sign in to analyze your resume.");
+  }
+
   const response = await fetch(`${API_URL}/api/analyze`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
     body: formData,
   });
 

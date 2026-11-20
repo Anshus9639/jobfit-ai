@@ -9,12 +9,18 @@ services:
     healthCheckPath: /health
     envVars:
       - key: ALLOWED_ORIGINS
-        value: "*"
-        # Set this to your deployed frontend URL after Vercel deploy,
-        # e.g. https://jobfit-ai.vercel.app
+        value: "https://jobfit-ai-steel.vercel.app"
       - key: PYTHON_VERSION
         value: "3.11.9"
+      - key: SUPABASE_URL
+        value: "https://aydkndeqhwsueybrllzw.supabase.co"
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
       - key: EMBEDDING_PROVIDER
-        value: huggingface
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: gemini-embedding-2
       - key: HF_TOKEN
         sync: false # secret: paste the value in the Render dashboard, never commit it

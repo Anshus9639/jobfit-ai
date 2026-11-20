@@ -8,7 +8,8 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Form, UploadFile, HTTPException, Request
+import httpx
+from fastapi import FastAPI, File, Form, UploadFile, HTTPException, Request, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -60,10 +61,77 @@ origins = [o.strip() for o in allowed_origins.split(",")] if allowed_origins != 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,  # no cookies/auth used; avoids invalid combo with wildcard origins
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+async def require_supabase_user(authorization: str | None = Header(default=None)) -> str:
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail="Sign in to analyze a resume.")
+
+    supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+    publishable_key = os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+    if not supabase_url or not publishable_key:
+        raise HTTPException(status_code=503, detail="Account authentication is not configured.")
+
+    token = authorization.split(" ", 1)[1].strip()
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.get(
+            f"{supabase_url}/auth/v1/user",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "apikey": publishable_key,
+            },
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=401, detail="Your session has expired. Please sign in again.")
+
+    user_id = response.json().get("id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unable to verify your account.")
+    return user_id
+
+
+async def reserve_monthly_analysis(
+    user_id: str = Depends(require_supabase_user),
+    authorization: str | None = Header(default=None),
+) -> str:
+    supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+    publishable_key = os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+    if not supabase_url or not publishable_key:
+        raise HTTPException(status_code=503, detail="Account authentication is not configured.")
+
+    token = (authorization or "").split(" ", 1)[1].strip()
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.post(
+            f"{supabase_url}/rest/v1/rpc/reserve_analysis",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "apikey": publishable_key,
+                "Content-Type": "application/json",
+            },
+            json={},
+        )
+
+    if response.status_code == 403:
+        raise HTTPException(
+            status_code=403,
+            detail="You have reached this month's analysis limit.",
+        )
+    if response.status_code >= 400:
+        logger.error("usage reservation failed: %s %s", response.status_code, response.text)
+        raise HTTPException(status_code=503, detail="Unable to verify your analysis allowance.")
+
+    result = response.json()
+    if isinstance(result, dict) and result.get("allowed") is False:
+        raise HTTPException(
+            status_code=403,
+            detail="You have reached this month's analysis limit.",
+        )
+    return user_id
 
 
 @app.exception_handler(EmbeddingError)
@@ -112,6 +180,7 @@ def health_ready():
 async def analyze(
     resume: UploadFile = File(...),
     job_description: str = Form(...),
+    user_id: str = Depends(reserve_monthly_analysis),
 ):
     # --- Validate job description ---
     job_description = (job_description or "").strip()

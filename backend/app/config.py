@@ -10,6 +10,12 @@ Secrets (API keys) are only ever read from the environment — never hardcoded.
 import os
 from dataclasses import dataclass
 from typing import Optional
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load backend/.env for local development. Existing process environment variables win.
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=False)
 
 # --- Request / upload limits (not environment-tunable: part of the API contract) ---
 MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
