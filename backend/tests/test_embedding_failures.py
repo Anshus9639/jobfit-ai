@@ -231,7 +231,7 @@ def test_huggingface_request_shape_and_auth_header():
     embed(client, ("hello resume", "hello jd"))
     request = provider.requests[0]
     assert request.url.host == "router.huggingface.co"
-    assert request.url.path == "/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction"
+    assert request.url.path == "/hf-inference/models/BAAI/bge-small-en-v1.5/pipeline/feature-extraction"
     assert request.headers["authorization"] == f"Bearer {TEST_TOKEN}"
     assert json.loads(request.content) == {"inputs": ["hello resume", "hello jd"], "truncate": True}
 

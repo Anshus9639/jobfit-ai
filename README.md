@@ -6,7 +6,7 @@ signals, and returns a match score along with a full breakdown of *why* you got 
 
 No database. No authentication. No LLM calls. Keyword, skill and ATS analysis run locally in
 pure Python; the semantic-similarity signal uses a hosted text-embedding API (default:
-Hugging Face `sentence-transformers/all-MiniLM-L6-v2`) so the server stays small enough for
+Hugging Face `BAAI/bge-small-en-v1.5`) so the server stays small enough for
 Render's 512 MB free tier.
 
 ## Features
@@ -144,18 +144,23 @@ Providers) and store it as the `HF_TOKEN` secret in Render — never commit it.
 > they are not free on a free HF account. A zero-cost alternative is Google's Gemini API,
 > whose standard free tier lists the embedding models as free of charge: set
 > `EMBEDDING_PROVIDER=gemini` and `GEMINI_API_KEY`. Different models give different
-> similarity distributions, so semantic scores shift versus `all-MiniLM-L6-v2`; and resume
+> similarity distributions, so semantic scores shift if you switch models; and resume
 > text is sent to whichever provider you choose, so review its data-use terms.
 > Always re-check current pricing and limits before relying on a free tier.
 
 To switch provider set `EMBEDDING_PROVIDER` (`huggingface` or `gemini`), the matching key
 (`HF_TOKEN` / `GEMINI_API_KEY`) and, if needed, `EMBEDDING_MODEL` / `EMBEDDING_API_URL`.
 
+> On hf-inference, `sentence-transformers/all-MiniLM-L6-v2` is only exposed for the
+> `sentence-similarity` task — the `feature-extraction` endpoint returns `404` for it.
+> Keep the `BAAI/bge-small-en-v1.5` default (or another model listed under
+> `pipeline_tag=feature-extraction` for that provider) when using Hugging Face.
+
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `EMBEDDING_PROVIDER` | `huggingface` | `huggingface` or `gemini` |
 | `HF_TOKEN` / `GEMINI_API_KEY` | — | Provider API key (secret) |
-| `EMBEDDING_MODEL` | provider default | Model id |
+| `EMBEDDING_MODEL` | `BAAI/bge-small-en-v1.5` (HF) / `gemini-embedding-2` (Gemini) | Model id |
 | `EMBEDDING_API_URL` | provider default | Override the endpoint |
 | `EMBEDDING_TIMEOUT_SECONDS` | `10` | Per-attempt timeout |
 | `EMBEDDING_TOTAL_TIMEOUT_SECONDS` | `25` | Deadline across all retries |
