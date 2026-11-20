@@ -31,6 +31,10 @@ export default function Home() {
 
   useEffect(() => {
     const billing = new URLSearchParams(window.location.search).get("billing");
+    const authError = new URLSearchParams(window.location.search).get("auth_error");
+    if (authError) {
+      setError(authError);
+    }
     if (billing === "success") {
       setBillingMessage("Subscription activated. Your account is now updating.");
     } else if (billing === "cancelled") {
