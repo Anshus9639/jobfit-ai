@@ -50,11 +50,12 @@ class EmbeddingSettings:
     max_input_chars: int  # each text is cut to this length before it leaves the server
 
 
-# Model defaults per provider. `huggingface` serves the same all-MiniLM-L6-v2 model the
-# app used locally, so semantic scores stay comparable; other providers use different
-# embedding spaces and will produce a different score distribution.
+# Model defaults per provider. hf-inference exposes all-MiniLM-L6-v2 only under the
+# sentence-similarity task, so its feature-extraction endpoint 404s; bge-small-en-v1.5
+# is a live 384-dim replacement. Other providers use different embedding spaces and will
+# produce a different score distribution.
 DEFAULT_MODELS = {
-    "huggingface": "sentence-transformers/all-MiniLM-L6-v2",
+    "huggingface": "BAAI/bge-small-en-v1.5",
     "gemini": "gemini-embedding-2",
 }
 

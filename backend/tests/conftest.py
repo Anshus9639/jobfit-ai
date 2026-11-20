@@ -93,7 +93,7 @@ def make_settings(**overrides) -> EmbeddingSettings:
     values = dict(
         provider="huggingface",
         api_key=TEST_TOKEN,
-        model="sentence-transformers/all-MiniLM-L6-v2",
+        model="BAAI/bge-small-en-v1.5",
         api_url=None,
         timeout_seconds=5.0,
         total_timeout_seconds=20.0,
