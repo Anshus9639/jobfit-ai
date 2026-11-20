@@ -18,16 +18,25 @@ html {
 }
 
 body {
-  background-color: #f8fafc;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(99, 102, 241, 0.13), transparent 28rem),
+    radial-gradient(circle at 92% 18%, rgba(14, 165, 233, 0.11), transparent 24rem),
+    #f8fafc;
+  color: #0f172a;
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-slate-200 p-6;
+    @apply relative overflow-hidden rounded-2xl border border-white/80 bg-white/90 p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.35)] backdrop-blur;
+  }
+
+  .card::before {
+    content: "";
+    @apply absolute inset-x-0 top-0 h-px bg-gradient-to-r from-brand-500/0 via-brand-500/60 to-cyan-400/0;
   }
 
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center rounded-full px-3 py-1 text-sm font-medium;
   }
 
   .badge-matched {
@@ -44,5 +53,9 @@ body {
 
   .progress-fill {
     @apply h-full rounded-full transition-all duration-700 ease-out;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-brand-600;
   }
 }

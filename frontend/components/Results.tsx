@@ -45,12 +45,21 @@ export default function Results({ result, onReset }: ResultsProps) {
     <div className="space-y-6">
       {/* Overall Match */}
       <div className="card text-center">
-        <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
+        <p className="eyebrow">
           Overall Match
         </p>
-        <p className={`text-6xl font-bold mt-2 ${scoreColor(result.overall_score)}`}>
-          {result.overall_score}%
-        </p>
+        <div
+          className="mx-auto mt-5 flex h-36 w-36 items-center justify-center rounded-full"
+          style={{
+            background: `conic-gradient(#4f6ef7 ${result.overall_score}%, #e2e8f0 0)`,
+          }}
+        >
+          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-white">
+            <p className={`text-4xl font-bold ${scoreColor(result.overall_score)}`}>
+              {result.overall_score}%
+            </p>
+          </div>
+        </div>
         <p className="text-slate-600 mt-4 max-w-2xl mx-auto">{result.recruiter_summary}</p>
       </div>
 

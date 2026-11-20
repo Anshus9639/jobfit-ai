@@ -55,7 +55,14 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card space-y-6">
+    <form onSubmit={handleSubmit} className="card mx-auto max-w-3xl space-y-6">
+      <div className="mb-2">
+        <p className="eyebrow">Start your analysis</p>
+        <h2 className="mt-2 text-xl font-semibold text-slate-900">Compare your fit in seconds</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Add your resume and the role you want to understand better.
+        </p>
+      </div>
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
           Resume (PDF)
@@ -68,10 +75,10 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
           onDragLeave={() => setDragActive(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center cursor-pointer transition-colors ${
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all ${
             dragActive
-              ? "border-brand-500 bg-brand-50"
-              : "border-slate-300 hover:border-brand-400 hover:bg-slate-50"
+              ? "border-brand-500 bg-brand-50 shadow-inner"
+              : "border-slate-300 bg-slate-50/60 hover:border-brand-400 hover:bg-brand-50/50"
           }`}
         >
           <input
@@ -112,7 +119,7 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
           onChange={(e) => setJobDescription(e.target.value)}
           rows={8}
           placeholder="Paste the full job description here..."
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-y"
+          className="w-full resize-y rounded-xl border border-slate-300 bg-slate-50/60 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10"
         />
       </div>
 
@@ -125,9 +132,9 @@ export default function UploadForm({ onSubmit, loading }: UploadFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3 transition-colors"
+        className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-indigo-500 py-3 font-semibold text-white shadow-lg shadow-brand-500/20 transition hover:from-brand-700 hover:to-indigo-600 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
       >
-        {loading ? "Analyzing..." : "Analyze Resume"}
+        {loading ? "Analyzing your fit..." : "Analyze my resume"}
       </button>
     </form>
   );
