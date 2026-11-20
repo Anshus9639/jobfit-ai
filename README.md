@@ -5,9 +5,9 @@ description — JobFit AI extracts skills, computes semantic similarity, checks 
 signals, and returns a match score along with a full breakdown of *why* you got that score.
 
 No database. No authentication. No LLM calls. Keyword, skill and ATS analysis run locally in
-pure Python; the semantic-similarity signal uses a hosted text-embedding API (default:
-Hugging Face `BAAI/bge-small-en-v1.5`) so the server stays small enough for
-Render's 512 MB free tier.
+pure Python; the semantic-similarity signal uses a hosted text-embedding API (Hugging Face
+`BAAI/bge-small-en-v1.5` by default, or Gemini `gemini-embedding-2`) so the server stays
+small enough for Render's 512 MB free tier.
 
 ## Features
 
@@ -91,7 +91,7 @@ cd backend
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # set HF_TOKEN (see below); adjust ALLOWED_ORIGINS if needed
+cp .env.example .env            # set GEMINI_API_KEY or HF_TOKEN (see below); adjust ALLOWED_ORIGINS if needed
 set -a; source .env; set +a     # the app reads real environment variables, not the file
 uvicorn app.main:app --reload --port 8000
 ```
@@ -129,32 +129,40 @@ everything automatically.
 2. **Root Directory:** `backend`
 3. **Build Command:** `pip install -r requirements.txt`
 4. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. **Environment Variables:** add `HF_TOKEN` (a Hugging Face access token — see below) and
-   `ALLOWED_ORIGINS` set to your Vercel frontend URL once deployed (e.g.
-   `https://your-project.vercel.app`). Use `*` initially if you want to test before the
-   frontend is deployed.
-6. **Health Check Path:** `/health`
+5. **Environment Variables:** add the embedding provider variables (Gemini or Hugging
+   Face — see below) and `ALLOWED_ORIGINS` set to your Vercel frontend URL once deployed
+   (e.g. `https://your-project.vercel.app`). Use `*` initially if you want to test before
+   the frontend is deployed.
+6. **Health Check Path:** `/health` (liveness). `GET /health/ready` additionally reports
+   `embedding_provider` and `embedding_configured`; it makes no network call, so it cannot
+   detect provider billing or quota problems.
 
-**Embedding provider setup.** Create a Hugging Face token at
-<https://huggingface.co/settings/tokens> (fine-grained, with permission to call Inference
-Providers) and store it as the `HF_TOKEN` secret in Render — never commit it.
+**Embedding provider setup.** Two providers are supported. Pick one and keep
+`EMBEDDING_MODEL` consistent with it. Store keys in Render's **Environment** tab as
+secrets — never commit them.
 
-> **Cost:** per Hugging Face's pricing page, free accounts get **no** Inference Providers
-> credits — you need purchased credits or PRO. Embedding calls for this app are tiny, but
-> they are not free on a free HF account. A zero-cost alternative is Google's Gemini API,
-> whose standard free tier lists the embedding models as free of charge: set
-> `EMBEDDING_PROVIDER=gemini` and `GEMINI_API_KEY`. Different models give different
-> similarity distributions, so semantic scores shift if you switch models; and resume
-> text is sent to whichever provider you choose, so review its data-use terms.
-> Always re-check current pricing and limits before relying on a free tier.
+- **Gemini:** create a key at <https://aistudio.google.com/apikey>, then set
+  `EMBEDDING_PROVIDER=gemini`, `GEMINI_API_KEY=<key>` and
+  `EMBEDDING_MODEL=gemini-embedding-2`. Gemini's standard free tier currently covers
+  embedding calls; check current quotas.
+- **Hugging Face:** create a fine-grained token at
+  <https://huggingface.co/settings/tokens> with permission to call Inference Providers, then
+  set `HF_TOKEN=<token>` (leave `EMBEDDING_PROVIDER=huggingface`). Free HF accounts have
+  **no** Inference Providers credits, so calls fail with an upstream
+  `402 Payment Required` until you buy pre-paid credits or subscribe to PRO.
 
-To switch provider set `EMBEDDING_PROVIDER` (`huggingface` or `gemini`), the matching key
-(`HF_TOKEN` / `GEMINI_API_KEY`) and, if needed, `EMBEDDING_MODEL` / `EMBEDDING_API_URL`.
+> Switching providers does not reset `EMBEDDING_MODEL`. A Hugging Face model id sent to
+> Gemini (or the reverse) fails with `404`. Use `gemini-embedding-2` for Gemini and
+> `BAAI/bge-small-en-v1.5` for Hugging Face, or delete the variable to use the defaults.
 
 > On hf-inference, `sentence-transformers/all-MiniLM-L6-v2` is only exposed for the
 > `sentence-similarity` task — the `feature-extraction` endpoint returns `404` for it.
 > Keep the `BAAI/bge-small-en-v1.5` default (or another model listed under
 > `pipeline_tag=feature-extraction` for that provider) when using Hugging Face.
+
+> Semantic scores are model-dependent: switching models changes the score distribution.
+> The 40/40/20 formula and the API response schema do not change. Resume and
+> job-description text is sent to whichever provider you choose; review its data-use terms.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -251,8 +259,15 @@ No manual redeploy step needed on either dashboard.
 }
 ```
 
-**Error responses:** `400` for invalid/empty PDFs, oversized files, or empty job
-descriptions, with a `detail` message.
+**Error responses** — always `{"detail": "..."}`; a failed semantic step fails the whole
+analysis, so no partial or estimated score is ever returned.
+
+| Status | When |
+| --- | --- |
+| `400` | Invalid/empty/scanned PDF, oversized upload, or empty/oversized job description |
+| `502` | Embedding provider rejected the call (upstream `402` no credits, `404` wrong model, etc.) or returned an unusable response |
+| `503` | Embedding service not configured, credentials rejected, rate-limited, or the server is busy (`Retry-After`) |
+| `504` | Embedding provider timed out |
 
 ## Troubleshooting
 
@@ -266,6 +281,27 @@ as live:
 - Save, wait for the automatic redeploy to finish (**Live** status, check Logs for
   `Application startup complete.`)
 - Hard-refresh the frontend (`Ctrl+Shift+R`) and retry
+
+**`Semantic similarity is unavailable: the embedding service is not configured`** — no
+provider key reached the process. Check Render → **Environment** and `GET /health/ready`
+(`embedding_configured` must be `true`), then wait for the automatic redeploy.
+
+**`Semantic similarity could not be computed right now`** — the provider call itself failed.
+Render → **Logs** has the upstream reason, for example:
+
+```
+analysis failed: EmbeddingProviderError (HTTP 402 {"error":"Purchase pre-paid credits..."})
+analysis failed: EmbeddingProviderError (HTTP 404 ...)
+```
+
+- `402` → the Hugging Face account has no Inference Providers credits; buy credits/PRO or
+  switch to Gemini.
+- `404` → wrong model for the provider or task; check `EMBEDDING_MODEL` (see provider
+  setup above).
+- `401`/`403` surface as *credentials were rejected* instead of the generic message.
+
+`/health` and `/health/ready` only check configuration; they cannot detect provider
+billing or quota problems — only a real `/api/analyze` call does.
 
 **`Module not found` on a component import** — the import path in `Results.tsx` (or
 wherever the import lives) must match the actual filename exactly, including case. Check the
@@ -289,8 +325,9 @@ and `npm run build` process these correctly regardless.
 - Resume and job-description text is sent to the configured embedding provider (truncated
   to 6,000 characters each) to compute the semantic score. Nothing is stored by this app,
   and resume text is never logged.
-- When the embedding provider is down, rate-limited or misconfigured, `/api/analyze`
-  fails with a clear `503`/`504` message rather than returning a partial or estimated score.
+- When the embedding provider is down, rate-limited, out of credits, or misconfigured,
+  `/api/analyze` fails with a clear `502`/`503`/`504` message rather than returning a
+  partial or estimated score.
 - Under load the server returns `503` with a `Retry-After` header instead of queueing
   unboundedly. Request bodies over ~5.1 MB get `413`.
 - Everything else happens in-memory per request; nothing is persisted.
